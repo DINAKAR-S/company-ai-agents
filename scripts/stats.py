@@ -37,7 +37,7 @@ def main() -> int:
     approval = sum(1 for r in roles if re.search(r"approv", r.body.split("## Working rules", 1)[1].split("## ", 1)[0], re.IGNORECASE))
     levels = Counter(r.level for r in roles)
     hints = Counter(r.model_hint for r in roles)
-    print("orgchart-agents proof")
+    print("company-ai-agents proof")
     print(f"roles:                 {len(roles)}")
     print(f"departments:           {len(cat.departments)}")
     print(f"levels:                {dict(levels)}")

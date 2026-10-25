@@ -10,6 +10,21 @@ from pathlib import Path
 from .catalog import load_catalog
 from .compose import Answers, Team, ask_in_terminal, compose
 from .export import TARGETS, export_team
+from .finder import find
+from .solve import (
+    DEFAULT_LEAD,
+    DEFAULT_MEMORY,
+    GENERAL,
+    Session,
+    add_lesson,
+    build_panel,
+    has_credentials,
+    load_lessons,
+    record_lessons,
+    solve,
+    write_dry_run,
+    write_outputs,
+)
 from .validate import validate
 
 
@@ -109,7 +124,84 @@ def cmd_export(args) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def _read_text_arg(value, flag: str) -> str:
+    """A flag can be inline text or @path to a file."""
+    if not value:
+        return ""
+    if value.startswith("@"):
+        path = Path(value[1:])
+        if not path.exists():
+            raise FileNotFoundError(f"{flag}: {path} not found")
+        return path.read_text(encoding="utf-8", errors="replace")
+    return value
+
+
+def cmd_find(args) -> int:
+    cat = load_catalog(_root(args))
+    hits = find(cat, args.problem, _read_text_arg(args.context, "--context"), limit=args.limit)
+    if not hits:
+        print("no role matched; add detail to the problem (systems, symptoms, who is affected)")
+        return 1
+    for m in hits:
+        print(f"{m.role.id:45} {m.score:6.1f}  {m.role.title}  [{', '.join(m.matched[:8])}]")
+    return 0
+
+
+def cmd_solve(args) -> int:
+    cat = load_catalog(_root(args))
+    problem = _read_text_arg(args.problem, "--problem")
+    context = _read_text_arg(args.context, "--context")
+    memory = None if args.no_memory else args.memory
+    extra = [x.strip() for x in (args.panelist or []) if x.strip()]
+    if args.dry_run:
+        lessons, warnings = load_lessons(memory)
+        panel, moderator, w = build_panel(cat, problem, context, args.size, args.lead, extra)
+        s = Session(problem=problem.strip(), context=context.strip(), panel=panel, moderator=moderator,
+                    warnings=warnings + w, lessons=lessons)
+        for p in write_dry_run(s, args.out):
+            print(p)
+        print(f"dry run: {len(panel)} panelists + moderator, no model calls")
+        return 0
+    if not has_credentials():
+        print("no Anthropic credentials found (ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or `ant auth login`). "
+              "Use --dry-run to see the panel and prompts without calling a model.", file=sys.stderr)
+        return 2
+    s = solve(cat, problem, context, size=args.size, lead=args.lead, extra=extra, memory=memory)
+    written = write_outputs(s, args.out)
+    for p in written:
+        print(p)
+    for w in s.warnings:
+        print(f"warning: {w}")
+    for e in s.errors:
+        print(f"error: {e}", file=sys.stderr)
+    if memory and (s.critiques or s.decision):
+        n = record_lessons(s, memory)
+        print(f"{n} lessons recorded in {memory} for the next panel")
+    if s.decision:
+        print(f"\n{s.moderator.name} ({s.moderator.role.title}) decided: {s.decision.get('decision', '')}")
+    return 0 if s.decision and not s.errors else (1 if s.decision else 2)
+
+
+def cmd_lesson(args) -> int:
+    if args.action == "add":
+        if not args.text:
+            print("lesson add needs the lesson text", file=sys.stderr)
+            return 2
+        e = add_lesson(args.memory, args.role or GENERAL, args.text, source="manual")
+        print(f"recorded for {e['role']}: {e['lesson']}")
+        return 0
+    lessons, warnings = load_lessons(args.memory)
+    for w in warnings:
+        print(f"warning: {w}")
+    if not lessons:
+        print(f"no lessons in {args.memory} yet; run `orgchart solve` or `orgchart lesson add`")
+        return 0
+    for x in lessons:
+        print(f"{x.get('date', '')}  {x['role']:40} {x['lesson']}")
+    return 0
+
+
+def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="orgchart", description="A company org chart of AI agents.")
     ap.add_argument("--root", default=".", help="repo root containing catalog.json (default: current directory)")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -126,6 +218,28 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--to", required=True, choices=TARGETS)
     p.add_argument("--out", required=True)
     p.set_defaults(fn=cmd_export)
+    p = sub.add_parser("find", help="rank roles for a problem statement (no model call)")
+    p.add_argument("problem")
+    p.add_argument("--context", help="company context, inline or @file")
+    p.add_argument("--limit", type=int, default=8)
+    p.set_defaults(fn=cmd_find)
+    p = sub.add_parser("solve", help="a named panel of roles debates a problem and writes plan, edge cases, requirements")
+    p.add_argument("--problem", required=True, help="the problem, inline or @file")
+    p.add_argument("--context", help="company context, inline or @file (website text, docs, stack)")
+    p.add_argument("--size", type=int, default=6, help="panelists including the lead (default 6)")
+    p.add_argument("--lead", default=DEFAULT_LEAD, help=f"role id that opens the panel (default {DEFAULT_LEAD})")
+    p.add_argument("--panelist", action="append", help="force a role onto the panel (repeatable)")
+    p.add_argument("--memory", default=DEFAULT_MEMORY, help=f"lessons file read before and written after (default {DEFAULT_MEMORY})")
+    p.add_argument("--no-memory", action="store_true", help="ignore and do not write lessons")
+    p.add_argument("--out", default="./solution")
+    p.add_argument("--dry-run", action="store_true", help="write the panel and prompts, call no model")
+    p.set_defaults(fn=cmd_solve)
+    p = sub.add_parser("lesson", help="list or add lessons the next panel will read")
+    p.add_argument("action", choices=["list", "add"])
+    p.add_argument("text", nargs="?", help="the lesson, in quotes")
+    p.add_argument("--role", help=f"role id the lesson is for (default {GENERAL!r}, every panelist)")
+    p.add_argument("--memory", default=DEFAULT_MEMORY)
+    p.set_defaults(fn=cmd_lesson)
     args = ap.parse_args(argv)
     try:
         return args.fn(args)

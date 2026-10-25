@@ -96,3 +96,45 @@ def test_export_with_a_garbage_team_file_is_a_clean_error(root, tmp_path):
     bad.write_text("[1, 2, 3]", encoding="utf-8")
     r = run("export", "--team", str(bad), "--to", "n8n", "--out", str(tmp_path / "o"), cwd=root)
     assert r.returncode == 2 and "Traceback" not in r.stderr
+
+
+def test_find_ranks_roles_without_a_model(root):
+    r = run("find", "support tickets pile up after releases", "--limit", "3", cwd=root)
+    assert r.returncode == 0, r.stderr
+    assert "customer/" in r.stdout
+
+
+def test_find_with_nonsense_is_a_clean_non_zero(root):
+    r = run("find", "zzzz qqqq", cwd=root)
+    assert r.returncode == 1 and "no role matched" in r.stdout
+
+
+def test_solve_dry_run_needs_no_credentials(root, tmp_path):
+    ctx = tmp_path / "ctx.md"
+    ctx.write_text("A 20-person clinic scheduling SaaS using Zendesk and Slack.", encoding="utf-8")
+    r = run("solve", "--problem", "support tickets pile up after every release", "--context", f"@{ctx}",
+            "--dry-run", "--size", "4", "--out", str(tmp_path / "sol"), "--no-memory", cwd=root)
+    assert r.returncode == 0, r.stderr
+    text = (tmp_path / "sol" / "panel.md").read_text(encoding="utf-8")
+    assert "Steven" in text or "moderator" in text
+    assert "Round 1 prompts" in text
+
+
+def test_solve_without_credentials_explains_dry_run(root, tmp_path, monkeypatch):
+    import os
+    env = {k: v for k, v in os.environ.items() if k not in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")}
+    env["HOME"] = str(tmp_path)
+    env["USERPROFILE"] = str(tmp_path)
+    r = subprocess.run([sys.executable, "-m", "orgchart", "solve", "--problem", "x y z", "--no-memory",
+                        "--out", str(tmp_path / "o")], check=False, cwd=root, capture_output=True, text=True, env=env)
+    assert r.returncode == 2 and "--dry-run" in r.stderr
+
+
+def test_lesson_add_and_list(root, tmp_path):
+    mem = tmp_path / "l.jsonl"
+    r = run("lesson", "add", "check the opt-out list", "--memory", str(mem), "--role", "sales/sdr", cwd=root)
+    assert r.returncode == 0 and "sales/sdr" in r.stdout
+    r = run("lesson", "list", "--memory", str(mem), cwd=root)
+    assert "check the opt-out list" in r.stdout
+    r = run("lesson", "list", "--memory", str(tmp_path / "none.jsonl"), cwd=root)
+    assert r.returncode == 0 and "no lessons" in r.stdout
