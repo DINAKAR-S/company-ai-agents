@@ -52,6 +52,26 @@ POSITION_SCHEMA = {
                  "mitigations", "questions_for_the_company"],
     "additionalProperties": False,
 }
+BRIEF_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "what_i_understand": {"type": "string"},
+        "deciding_constraint": {"type": "string"},
+        "assumptions": {"type": "array", "items": {"type": "string"}},
+        "questions_for_the_company": {
+            "type": "array",
+            "items": {"type": "object", "properties": {"question": {"type": "string"}, "my_guess": {"type": "string"}},
+                      "required": ["question", "my_guess"], "additionalProperties": False},
+        },
+        "roles_to_consult": {
+            "type": "array",
+            "items": {"type": "object", "properties": {"role_id": {"type": "string"}, "question": {"type": "string"}},
+                      "required": ["role_id", "question"], "additionalProperties": False},
+        },
+    },
+    "required": ["what_i_understand", "deciding_constraint", "assumptions", "questions_for_the_company", "roles_to_consult"],
+    "additionalProperties": False,
+}
 CRITIQUE_SCHEMA = {
     "type": "object",
     "properties": {
@@ -71,9 +91,12 @@ DECISION_SCHEMA = {
         "plan_md": {"type": "string"},
         "edge_cases_md": {"type": "string"},
         "requirements_md": {"type": "string"},
+        "architecture_mermaid": {"type": "string"},
+        "setup_md": {"type": "string"},
         "open_questions": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["decision", "plan_md", "edge_cases_md", "requirements_md", "open_questions"],
+    "required": ["decision", "plan_md", "edge_cases_md", "requirements_md", "architecture_mermaid", "setup_md",
+                 "open_questions"],
     "additionalProperties": False,
 }
 
@@ -168,6 +191,10 @@ class Session:
     warnings: list[str] = field(default_factory=list)
     lessons: list[dict] = field(default_factory=list)
     style: str = ""
+    brief: dict | None = None                                   # the lead's round 0
+    consult: dict[str, str] = field(default_factory=dict)       # role id -> the lead's question for it
+    max_extra_seats: int = 3
+    catalog_ids: set = field(default_factory=set)
 
 
 def build_panel(catalog: Catalog, problem: str, context: str, size: int = 6,
@@ -221,8 +248,61 @@ def _brief(s: Session) -> str:
     return f"## Company context\n\n{s.context or '(none given)'}\n\n## Problem\n\n{s.problem}\n"
 
 
+def round0_prompt(s: Session) -> tuple[str, str]:
+    """The lead reads the problem first and says who it needs and what it would ask them."""
+    lead = s.panel[0]
+    others = "\n".join(f"- `{p.role.id}`: {p.role.title}" for p in s.panel[1:])
+    catalog_hint = ", ".join(sorted(s.catalog_ids))[:4000] if s.catalog_ids else ""
+    user = (_brief(s) + f"\n## Already seated with you\n{others or '- (nobody yet)'}\n\n"
+            "Before anyone speaks: say what you understand the problem to be, the one constraint that will decide "
+            "the design, the assumptions you are making, the questions the company must answer (each with your best "
+            "guess so they can just say yes), and which colleagues you need to consult with the exact question for "
+            "each. Use role ids from this list only: " + catalog_hint + ". Ask only for roles whose answer changes "
+            "the design; three is usually enough.")
+    return _persona(lead, s.panel, s.lessons, s.style), user
+
+
+def seat_consulted(catalog: Catalog, s: Session) -> list[str]:
+    """Seat the roles the lead asked for, if they exist and are not already there. Returns the ids added."""
+    added: list[str] = []
+    if not s.brief:
+        return added
+    present = {p.role.id for p in s.panel} | {MODERATOR}
+    for item in s.brief.get("roles_to_consult", []):
+        rid, q = item.get("role_id", "").strip(), item.get("question", "").strip()
+        if rid in present:
+            if q:
+                s.consult[rid] = q
+            continue
+        if rid not in catalog.roles:
+            s.warnings.append(f"lead asked for {rid!r}, which is not a catalog role; skipped")
+            continue
+        if len(added) >= s.max_extra_seats:
+            s.warnings.append(f"lead asked for {rid!r} but the panel is full; skipped")
+            continue
+        s.panel.append(Panelist(catalog.roles[rid], "", ["asked for by the lead"]))
+        present.add(rid)
+        added.append(rid)
+        if q:
+            s.consult[rid] = q
+    if added:
+        names = assign([p.role.id for p in s.panel] + [MODERATOR])
+        for p in s.panel:
+            p.name = names[p.role.id]
+        s.moderator.name = names[MODERATOR]
+    return added
+
+
 def round1_prompt(s: Session, p: Panelist) -> tuple[str, str]:
-    user = (_brief(s) + "\nGive your position: the approach you would take, concrete steps, risks, "
+    lead_note = ""
+    if s.brief and p is s.panel[0]:
+        lead_note = "\n## Your own brief from round 0\n" + json.dumps(s.brief, indent=2) + "\n"
+    elif s.brief:
+        lead_note = (f"\n## The lead's brief\n{s.brief.get('what_i_understand', '')}\n"
+                     f"Deciding constraint, as the lead sees it: {s.brief.get('deciding_constraint', '')}\n")
+        if p.role.id in s.consult:
+            lead_note += f"\n**{s.panel[0].name} asked you specifically:** {s.consult[p.role.id]}\nAnswer that first.\n"
+    user = (_brief(s) + lead_note + "\nGive your position: the approach you would take, concrete steps, risks, "
             "edge cases a careful engineer would test for, requirements the solution must meet, what in the "
             "present setup will break and how you would mitigate each item, and the questions you would ask "
             "the company before starting.")
@@ -255,7 +335,11 @@ def round3_prompt(s: Session) -> tuple[str, str]:
     user = (_brief(s) + "\n" + transcript +
             "\n\nDecide the approach. Produce plan_md (phases, owners by role id, what done looks like), "
             "edge_cases_md (a table: case, expected behaviour, how to test), requirements_md (functional, "
-            "data, security and privacy, operational; each one testable), and the open questions the company must answer.")
+            "data, security and privacy, operational; each one testable), architecture_mermaid (a Mermaid "
+            "flowchart of the chosen solution: systems as nodes, data flow as arrows, the human approval step "
+            "shown; source only, no code fence), setup_md (everything the company must set up before step one: "
+            "accounts, environment variable names for each credential and where to create the key, who owns "
+            "each; never ask for or include a credential value), and the open questions the company must answer.")
     return system, user
 
 
@@ -299,7 +383,16 @@ def solve(catalog: Catalog, problem: str, context: str = "", size: int = 6, lead
     panel, moderator, w = build_panel(catalog, problem, context, size, lead, extra)
     s = Session(problem=problem.strip(), context=context.strip(), panel=panel, moderator=moderator,
                 warnings=warnings + w, lessons=lessons, style=catalog.style)
+    s.catalog_ids = set(catalog.roles)
     call = call or api_call
+
+    # Round 0: the lead reads first and says who it needs. A failed brief is recorded and the panel proceeds as found.
+    system, user = round0_prompt(s)
+    try:
+        s.brief = call(_model_for(s.panel[0]), system, user, BRIEF_SCHEMA)
+        seat_consulted(catalog, s)
+    except Exception as ex:  # noqa: BLE001
+        s.errors.append(f"round 0, {s.panel[0].label}: {ex}")
 
     for p in s.panel:
         system, user = round1_prompt(s, p)
@@ -339,7 +432,9 @@ def write_outputs(s: Session, out_dir: str | Path) -> list[Path]:
         "problem": s.problem,
         "panel": [{"name": p.name, "role": p.role.id, "title": p.role.title, "model": _model_for(p), "matched": p.matched} for p in s.panel],
         "moderator": {"name": s.moderator.name, "role": s.moderator.role.id},
-        "rounds_completed": {"positions": len(s.positions), "critiques": len(s.critiques), "decision": s.decision is not None},
+        "rounds_completed": {"brief": s.brief is not None, "positions": len(s.positions), "critiques": len(s.critiques),
+                             "decision": s.decision is not None},
+        "consulted": s.consult,
         "errors": s.errors, "warnings": s.warnings,
     }
     p = out / "panel.json"; p.write_text(json.dumps(panel_json, indent=2) + "\n", encoding="utf-8"); written.append(p)
@@ -348,6 +443,13 @@ def write_outputs(s: Session, out_dir: str | Path) -> list[Path]:
     for pl in s.panel:
         lines.append(f"- **{pl.name}**, {pl.role.title} (`{pl.role.id}`)" + (f", matched: {', '.join(pl.matched)}" if pl.matched else ""))
     lines.append(f"- **{s.moderator.name}**, {s.moderator.role.title}, moderator")
+    if s.brief:
+        b = s.brief
+        lines += ["", f"## Round 0: {s.panel[0].name} reads the problem", "", b.get("what_i_understand", ""), "",
+                  f"**Deciding constraint:** {b.get('deciding_constraint', '')}", "", "**Assumptions**",
+                  _md_list(b.get("assumptions", [])), "", "**Questions for the company (with the lead's guess)**",
+                  _md_list([f"{q.get('question', '')} (guess: {q.get('my_guess', '')})" for q in b.get("questions_for_the_company", [])]),
+                  "", "**Consulted**", _md_list([f"`{r.get('role_id', '')}`: {r.get('question', '')}" for r in b.get("roles_to_consult", [])]), ""]
     lines += ["", "## Round 1: positions", ""]
     for name, pos in s.positions.items():
         lines += [f"### {name}", "", f"**Approach:** {pos.get('approach','')}", "", "**Steps**", _md_list(pos.get("steps", [])), "",
@@ -373,10 +475,20 @@ def write_outputs(s: Session, out_dir: str | Path) -> list[Path]:
     p = out / "debate.md"; p.write_text("\n".join(lines), encoding="utf-8"); written.append(p)
 
     if s.decision:
-        for fname, key in (("plan.md", "plan_md"), ("edge-cases.md", "edge_cases_md"), ("requirements.md", "requirements_md")):
+        plan = s.decision.get("plan_md", "").rstrip()
+        mermaid = s.decision.get("architecture_mermaid", "").strip().strip("`")
+        if mermaid.lower().startswith("mermaid\n"):
+            mermaid = mermaid.split("\n", 1)[1]
+        if mermaid:
+            plan += "\n\n## Architecture\n\n```mermaid\n" + mermaid.rstrip() + "\n```"
+        p = out / "plan.md"; p.write_text(plan + "\n", encoding="utf-8"); written.append(p)
+        for fname, key in (("edge-cases.md", "edge_cases_md"), ("requirements.md", "requirements_md")):
             p = out / fname
             p.write_text(s.decision.get(key, "").rstrip() + "\n", encoding="utf-8")
             written.append(p)
+        setup = s.decision.get("setup_md", "").strip()
+        if setup:
+            p = out / "setup.md"; p.write_text(setup + "\n", encoding="utf-8"); written.append(p)
     return written
 
 
@@ -392,7 +504,9 @@ def write_dry_run(s: Session, out_dir: str | Path) -> list[Path]:
         lines += ["", f"Lessons loaded from earlier panels: {len(s.lessons)}"]
     if s.warnings:
         lines += ["", "## Warnings", "", _md_list(s.warnings)]
-    lines += ["", "## Round 1 prompts", ""]
+    system0, user0 = round0_prompt(s)
+    lines += ["", f"## Round 0 prompt ({s.panel[0].label} reads first)", "", "**System**", "", "```", system0, "```", "",
+              "**User**", "", "```", user0, "```", "", "## Round 1 prompts", ""]
     for p in s.panel:
         system, user = round1_prompt(s, p)
         lines += [f"### {p.label}", "", "**System**", "", "```", system, "```", "", "**User**", "", "```", user, "```", ""]

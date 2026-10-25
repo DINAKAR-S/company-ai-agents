@@ -10,13 +10,16 @@
 
 Names come from a fixed list by hashing the role id, so the same role is always the same person across runs, and two roles on one panel never share a name. The names are labels for readability, nothing more.
 
-## The three rounds
+## The four rounds
 
 | Round | Who | Gets | Returns (strict JSON schema) |
 |---|---|---|---|
+| 0 Brief | the lead alone | context + problem + who is already seated + the role catalog | what it understands, the deciding constraint, assumptions, questions for the company with its guess beside each, and the colleagues to consult with the exact question for each |
 | 1 Position | each panelist, in its own role prompt | context + problem + lessons from earlier panels | approach, steps, risks, edge cases, requirements, what breaks in the present setup, mitigations, questions for the company |
 | 2 Critique | each panelist | all round 1 positions, by name | best approach and why, disagreements, edge cases everyone missed, changes to own position |
-| 3 Decision | moderator, on the deep model | everything | decision, `plan.md`, `edge-cases.md`, `requirements.md`, open questions |
+| 3 Decision | moderator, on the deep model | everything | decision, `plan.md` (with a Mermaid architecture diagram), `edge-cases.md`, `requirements.md`, `setup.md` (accounts and environment variable names, never values), open questions |
+
+Roles the lead asks for in round 0 are seated if they exist in the catalog (up to three extra seats; unknown ids are skipped with a warning), and each gets the lead's question at the top of its round 1 prompt. A failed brief is recorded and the panel proceeds as the finder built it.
 
 Panelists run on the model their `model_hint` maps to (fast, balanced, deep). The moderator always decides on the deep model.
 
@@ -29,7 +32,10 @@ solution/
   plan.md           phases, owners by role id, what done looks like
   edge-cases.md     table: case, expected behaviour, how to test
   requirements.md   functional, data, security and privacy, operational; each testable
+  setup.md          what to set up before step one: accounts, env var names, where each key is created, owners
 ```
+
+No agent asks for a credential value, ever. `setup.md` names the environment variable and where to create the key; the person puts it in their environment or secret store themselves.
 
 If a panelist's call fails, the session continues without it and the failure is listed in `panel.json` and at the bottom of `debate.md`. If round 1 produces nothing, the session stops and says so. A failed moderator leaves `debate.md` and `panel.json` only.
 
@@ -57,4 +63,4 @@ writes `solution/panel.md`: who was seated, why, and the full round 1 prompt for
 
 ## Cost
 
-A six-person panel is 13 calls: six positions, six critiques, one decision. With a typical one-page context the whole run is a few tens of thousands of tokens. `--size 4` roughly halves it. The exact token counts are in the response usage of each call; the script does not hide them from you, it just does not add them up yet.
+A six-person panel is 14 calls: one brief, six positions, six critiques, one decision, plus one position and one critique for each role the lead adds. With a typical one-page context the whole run is a few tens of thousands of tokens. `--size 4` roughly halves it. The exact token counts are in the response usage of each call; the script does not hide them from you, it just does not add them up yet.

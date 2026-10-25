@@ -53,3 +53,16 @@ What looked fine: tests passed, then the repo folder was renamed for the GitHub 
 What was true: the editable install in `.venv` still pointed at the old path, so `python -m orgchart` raised `ModuleNotFoundError` while the source sat right there.
 How it was caught: a subagent's validator run.
 What changed: `pip install -e .` again after any move. CI never sees this because it installs fresh; a local checkout does.
+
+## A patch script that writes before it asserts leaves a half-applied file
+
+What looked fine: a scripted multi-step edit with an assertion per step.
+What was true: step N wrote the file, step N+1 asserted on a mistyped anchor and died, and a rerun re-applied step 1 because the idempotency check looked for the wrong thing, duplicating a schema block. A third run then stripped both copies.
+How it was caught: the duplicate was visible in `grep -c`; the missing block by the import failing.
+What changed: patch scripts now check `old not in s and new in s` per step and skip, and the dedupe uses the second match as the boundary. Better still, for anything over three steps, write the file whole.
+
+## A test that looks for the role id in a prompt that never contains it
+
+What looked fine: a spy that matched `id: legal/privacy-officer` in the system prompt.
+What was true: the system prompt is the body of the role file; the front matter with the id is never sent. The spy matched nothing and the test failed for the wrong reason.
+What changed: the test finds the panelist by role after the run and matches its panel name in the prompt, which is what the model actually sees.

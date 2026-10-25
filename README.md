@@ -22,7 +22,7 @@ Company: <your website text, what you sell, the tools you use, headcount>
 Problem: <what hurts>
 ```
 
-Sam reads what you gave him, shows a one-screen picture of your company so you can correct it, asks at most two questions, and seats a panel chosen for your problem. For the problem above it looks like the picture: Steven (Data and AI Solutions Architect) opens; Priya (Sales Development), Mateo (Support Escalation), Aisha (Revenue Ops) and Hiroshi (Customer Success) argue the approach, say what in your current setup will break, and list the edge cases; Lena (Chief of Staff) decides and writes three files: `plan.md`, `edge-cases.md`, `requirements.md`. Ten minutes. Which roles sit is decided by `orgchart find` from your words, so a hiring problem gets recruiters, a cash problem gets finance. Nothing is sent, posted or changed anywhere; every agent here refuses to act on a live system without a human yes.
+Sam reads what you gave him, shows a one-screen picture of your company so you can correct it, asks at most two questions, and seats a panel chosen for your problem. The lead reads first and names who to consult and what to ask them. For the problem above it looks like the picture: Steven (Data and AI Solutions Architect) opens; Priya (Sales Development), Mateo (Support Escalation), Aisha (Revenue Ops) and Hiroshi (Customer Success) argue the approach, say what in your current setup will break, and list the edge cases; Lena (Chief of Staff) decides and writes three files: `plan.md`, `edge-cases.md`, `requirements.md`. Ten minutes. Which roles sit is decided by `orgchart find` from your words, so a hiring problem gets recruiters, a cash problem gets finance. Nothing is sent, posted or changed anywhere; every agent here refuses to act on a live system without a human yes.
 
 No Claude Code? Everything also runs from the terminal, and any agent that reads this repo finds its instructions in [AGENTS.md](AGENTS.md).
 
@@ -32,7 +32,7 @@ No Claude Code? Everything also runs from the terminal, and any agent that reads
 |---|---|
 | **Sam, the Problem Solver** | The front door. Learns your company, shows it back to you, asks only what changes the answer, runs the panel, remembers what it got wrong. `onboarding/problem-solver/AGENT.md` |
 | **135 roles** | Marketing (LinkedIn ghostwriter, Reddit writer, Instagram creator, short-video scriptwriter, newsletter writer, SEO, ads, PR...), sales (SDR, AE, call coach, RevOps, deal desk...), support and success, people and HR (recruiter, HR ops, onboarding, comp...), finance (AR, AP, FP&A, payroll...), operations, data and dashboards, product, engineering, legal, strategy, the C-suite. |
-| **A panel that debates** | `solve`: lead, top matches, moderator. Position, critique, decision. Writes the debate and the three files. |
+| **A panel that debates** | `solve`: the lead reads first and says who to consult and what to ask them; those people are seated. Position, critique, decision. Writes the debate, `plan.md` with an architecture diagram, `edge-cases.md`, `requirements.md`, and `setup.md` (what to set up, which env vars, never a key in chat). |
 | **Memory** | `lesson`: what a panel missed goes into a file the next panel reads. Add your own in one line. |
 | **A team for your company** | `hire`: seven questions, a team with the reason for every pick. |
 | **Three runtimes** | `export` to Claude Code subagents, Anthropic Managed Agents (`ant apply` layout), or n8n AI Agent prompts. One source file. |
@@ -75,7 +75,7 @@ The web page does the copying for you: pick a role, "Copy the prompt" or "Copy a
 | Skills are editorial | A pipeline exists to count skills across real job postings per role (`research/`). It has not been run yet. |
 | Hierarchy runs where the runtime allows | Claude Code subagents cannot call each other; escalation is a marker the main session routes. Managed Agents can delegate with a roster you configure. n8n branches on a JSON marker. |
 | `find` is word overlap | With an alias table, not semantic search. Use practitioner words: tickets, leads, invoices, candidates, churn. |
-| Depth is even | Every role is 80 to 95 lines. If you have done one of these jobs, you will see what to add. That is the pull request this repo wants most. |
+| Depth | Every role is 150 to 170 lines: tasks, rules, how it thinks, the questions it asks first, mistakes it refuses, how it debates, and a worked example with a real answer. If you have done one of these jobs, you will still see what to add. That is the pull request this repo wants most. |
 | Catalog is a software company | Manufacturing, clinics, agencies need roles this chart does not have yet. New departments are a pull request away. |
 
 Other collections of Claude Code subagents exist (wshobson/agents, VoltAgent/awesome-claude-code-subagents, davila7/claude-code-templates) and go deeper on engineering. This repo's difference is the whole company, the hierarchy, Sam, the panel, the memory, and the three runtimes.
@@ -85,8 +85,8 @@ Other collections of Claude Code subagents exist (wshobson/agents, VoltAgent/awe
 From `python scripts/stats.py`, run by CI on every push on Linux and Windows:
 
 ```
-roles: 135   departments: 13   approval gate in every role: 135 of 135
-cross-role references: 1400+, dangling: 0   validator problems: 0   tests: 77
+roles: 135   departments: 13   approval gate in every role: 135 of 135   lines per role: 147 to 171
+cross-role references: 2800+, dangling: 0   validator problems: 0   tests: 81
 ```
 
 ## Layout

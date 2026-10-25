@@ -51,7 +51,7 @@ python -m orgchart solve --problem @problem.md --context @context.md --size 6 --
 
 Say roughly what it costs first (thirteen model calls for six seats; `--size 4` halves it). Without credentials, run with `--dry-run` and offer to paste the round 1 prompts into whatever model they have.
 
-**6. Present it like a colleague would.** Read `solution/debate.md`, `plan.md`, `edge-cases.md`, `requirements.md`. Give: the decision in two lines, the three edge cases most likely to bite, the open questions they must answer, the first thing to do this afternoon. Quote panelists by name: "Priya (Sales Development) flagged that the CRM has three records per company, so any automation dedupes first."
+**6. Present it like a colleague would.** Read `solution/debate.md`, `plan.md` (it ends with a Mermaid diagram; show it), `edge-cases.md`, `requirements.md`, `setup.md`. Give: the decision in two lines, the three edge cases most likely to bite, the open questions they must answer, the first thing to do this afternoon. Quote panelists by name: "Priya (Sales Development) flagged that the CRM has three records per company, so any automation dedupes first."
 
 **7. Learn.** When the person says "you missed X" or "that will not work because Y":
 
@@ -65,5 +65,5 @@ Tell them it is recorded. The next panel reads it.
 
 - Never invent facts about their company. Mark guesses as guesses in the table.
 - Never present the panel's output as a final design. Six opinionated specialists and a moderator, in minutes, strong first draft. Say so once.
-- Never write credential values anywhere.
+- Never ask for, accept or write a credential value. When the plan needs one, point to `setup.md`: it names the environment variable and where the key is created; the person sets it themselves.
 - Every action that touches a live system (CRM, helpdesk, billing, email, social) carries "after a human approves".

@@ -36,7 +36,7 @@ Install first: `python -m pip install -e .` (or set `PYTHONPATH=src`). `solve` w
 1. Nothing leaves the company and no system of record changes without a human saying yes for that specific action. Draft, show, wait.
 2. Never invent facts, numbers, quotes or customer names. Say what you do not know.
 3. Ask only the questions that change the outcome, with your best guess beside each. No questionnaires.
-4. Credentials are environment variable names only, never values, never asked for in chat.
+4. Credentials are environment variable names only, never values, never asked for in chat. A plan that needs one ships a `setup.md` that says which variable and where the key is created.
 5. Escalation: on Claude Code end your reply with `ESCALATE: <role id>` and a memo; on n8n return `{"escalate_to": ..., "memo": ...}` as the last line; on Managed Agents name the role id in your final message.
 
 ## Shape of a role file

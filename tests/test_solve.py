@@ -3,6 +3,7 @@ import json
 import pytest
 
 from orgchart.solve import (
+    BRIEF_SCHEMA,
     CRITIQUE_SCHEMA,
     DECISION_SCHEMA,
     MAX_CONTEXT_CHARS,
@@ -27,6 +28,12 @@ def fake_call_factory(fail_for: set[str] | None = None, log: list | None = None)
         name = system.split("Your name on this panel is ")[1].split(".")[0] if "Your name on this panel is " in system else "mod"
         if name in fail_for:
             raise RuntimeError("simulated 500")
+        if schema is BRIEF_SCHEMA:
+            return {"what_i_understand": "tickets spike after releases", "deciding_constraint": "helpdesk rate limit",
+                    "assumptions": ["80 tickets a day"],
+                    "questions_for_the_company": [{"question": "tickets per day?", "my_guess": "80"}],
+                    "roles_to_consult": [{"role_id": "legal/privacy-officer", "question": "may ticket text leave our region?"},
+                                         {"role_id": "nope/nobody", "question": "x"}]}
         if schema is POSITION_SCHEMA:
             return {"approach": f"{name}'s approach", "steps": ["a", "b"], "risks": ["r"], "edge_cases": ["empty ticket"],
                     "requirements": ["must log"], "what_breaks_in_the_current_setup": ["helpdesk API rate limit"],
@@ -36,7 +43,9 @@ def fake_call_factory(fail_for: set[str] | None = None, log: list | None = None)
                     "changes_to_my_position": []}
         assert schema is DECISION_SCHEMA
         return {"decision": "go with the triage step", "plan_md": "# Plan\n\n1. do it", "edge_cases_md": "# Edge cases\n\n| case | expected | test |\n|---|---|---|",
-                "requirements_md": "# Requirements\n\n- must log", "open_questions": ["budget?"]}
+                "requirements_md": "# Requirements\n\n- must log", "architecture_mermaid": "flowchart LR\n  Z[Zendesk] --> F[function]",
+                "setup_md": "# Setup\n\n- HELPDESK_API_KEY: create in the helpdesk admin, owner: support lead",
+                "open_questions": ["budget?"]}
     return call
 
 
@@ -61,10 +70,17 @@ def test_full_session_writes_all_files(catalog, tmp_path):
     log = []
     s = solve(catalog, PROBLEM, CONTEXT, size=4, call=fake_call_factory(log=log))
     assert not s.errors
-    assert len(s.positions) == 4 and len(s.critiques) == 4 and s.decision
+    # the lead asked for the privacy officer, who was seated; the unknown role was skipped with a warning
+    assert "legal/privacy-officer" in [p.role.id for p in s.panel]
+    assert any("nope/nobody" in w for w in s.warnings)
+    assert len(s.positions) == 5 and len(s.critiques) == 5 and s.decision
     written = write_outputs(s, tmp_path)
     names = sorted(p.name for p in written)
-    assert names == ["debate.md", "edge-cases.md", "panel.json", "plan.md", "requirements.md"]
+    assert names == ["debate.md", "edge-cases.md", "panel.json", "plan.md", "requirements.md", "setup.md"]
+    plan = (tmp_path / "plan.md").read_text(encoding="utf-8")
+    assert "```mermaid" in plan and "flowchart LR" in plan
+    assert "HELPDESK_API_KEY" in (tmp_path / "setup.md").read_text(encoding="utf-8")
+    assert "Round 0" in (tmp_path / "debate.md").read_text(encoding="utf-8")
     debate = (tmp_path / "debate.md").read_text(encoding="utf-8")
     assert "## Round 3: decision" in debate and "go with the triage step" in debate
     # moderator decides on the deep model regardless of its own hint
@@ -148,7 +164,7 @@ def test_lessons_are_deduplicated_and_bad_lines_are_skipped(tmp_path):
 
 def test_missing_memory_file_is_an_empty_memory(catalog, tmp_path):
     s = solve(catalog, PROBLEM, CONTEXT, size=2, call=fake_call_factory(), memory=tmp_path / "none.jsonl")
-    assert s.lessons == [] and not s.warnings
+    assert s.lessons == [] and not any("lessons" in w for w in s.warnings)
 
 
 def test_debate_shows_what_breaks_and_mitigations(catalog, tmp_path):
@@ -167,3 +183,37 @@ def test_house_style_reaches_every_panelist_and_the_moderator(catalog):
 
     solve(catalog, PROBLEM, CONTEXT, size=3, call=spy)
     assert seen and all("## How you talk" in s_ for s_ in seen)
+
+
+def test_consulted_role_gets_the_leads_question_in_round_1(catalog):
+    seen = []
+
+    def spy(model, system, user, schema):
+        if schema is POSITION_SCHEMA:
+            seen.append((system, user))
+        return fake_call_factory()(model, system, user, schema)
+
+    s = solve(catalog, PROBLEM, CONTEXT, size=3, call=spy)
+    assert s.consult.get("legal/privacy-officer") == "may ticket text leave our region?"
+    officer = next(p for p in s.panel if p.role.id == "legal/privacy-officer")
+    asked = [u for sys_, u in seen if f"Your name on this panel is {officer.name}." in sys_]
+    assert len(asked) == 1 and "asked you specifically" in asked[0] and "leave our region" in asked[0]
+    # nobody else got that question
+    assert sum("asked you specifically" in u for _, u in seen) == 1
+
+
+def test_names_stay_unique_after_the_lead_adds_seats(catalog):
+    s = solve(catalog, PROBLEM, CONTEXT, size=5, call=fake_call_factory())
+    names = [p.name for p in s.panel] + [s.moderator.name]
+    assert len(names) == len(set(names)) and all(names)
+
+
+def test_failed_brief_means_panel_as_found(catalog):
+    def no_brief(model, system, user, schema):
+        if schema is BRIEF_SCHEMA:
+            raise RuntimeError("timeout")
+        return fake_call_factory()(model, system, user, schema)
+
+    s = solve(catalog, PROBLEM, CONTEXT, size=3, call=no_brief)
+    assert s.brief is None and len(s.panel) == 3 and s.decision
+    assert any("round 0" in e for e in s.errors)
