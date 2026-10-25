@@ -22,7 +22,7 @@ Company: <your website text, what you sell, the tools you use, headcount>
 Problem: <what hurts>
 ```
 
-Sam reads what you gave him, shows a one-screen picture of your company so you can correct it, asks at most two questions, and seats a panel. Steven (Data and AI Solutions Architect) opens. Priya (Sales Development), Mateo (Support Escalation), Aisha (Revenue Ops), Hiroshi (Customer Success) argue the approach, say what in your current setup will break, and list the edge cases. Lena (Chief of Staff) decides and writes three files: `plan.md`, `edge-cases.md`, `requirements.md`. Ten minutes. Nothing is sent, posted or changed anywhere; every agent here refuses to act on a live system without a human yes.
+Sam reads what you gave him, shows a one-screen picture of your company so you can correct it, asks at most two questions, and seats a panel chosen for your problem. For the problem above it looks like the picture: Steven (Data and AI Solutions Architect) opens; Priya (Sales Development), Mateo (Support Escalation), Aisha (Revenue Ops) and Hiroshi (Customer Success) argue the approach, say what in your current setup will break, and list the edge cases; Lena (Chief of Staff) decides and writes three files: `plan.md`, `edge-cases.md`, `requirements.md`. Ten minutes. Which roles sit is decided by `orgchart find` from your words, so a hiring problem gets recruiters, a cash problem gets finance. Nothing is sent, posted or changed anywhere; every agent here refuses to act on a live system without a human yes.
 
 No Claude Code? Everything also runs from the terminal, and any agent that reads this repo finds its instructions in [AGENTS.md](AGENTS.md).
 

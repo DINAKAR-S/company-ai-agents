@@ -51,3 +51,11 @@ def test_names_are_stable_and_unique_within_a_panel():
     names = assign(ids)
     assert len(set(names.values())) == len(ids)
     assert all(n in NAMES or n.startswith("Panelist-") for n in names.values())
+
+
+def test_hero_names_are_pinned_and_never_reused():
+    from orgchart.names import PINNED
+    assert name_for("data-ai/data-ai-solutions-architect") == "Steven"
+    assert name_for("c-suite/chief-of-staff") == "Lena"
+    ids = [f"dept/role-{i}" for i in range(30)]
+    assert not set(assign(ids).values()) & set(PINNED.values())

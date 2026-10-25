@@ -17,21 +17,35 @@ NAMES = [
 ]
 
 
+# The faces on the README hero image. Pinned so the picture, the docs and a real panel agree.
+PINNED = {
+    "data-ai/data-ai-solutions-architect": "Steven",
+    "sales/sdr": "Priya",
+    "customer/support-escalation": "Mateo",
+    "sales/revops": "Aisha",
+    "customer/customer-success-manager": "Hiroshi",
+    "c-suite/chief-of-staff": "Lena",
+}
+POOL = [n for n in NAMES if n not in PINNED.values()]
+
+
 def name_for(role_id: str, taken: set[str] | None = None) -> str:
-    h = int(hashlib.sha1(role_id.encode("utf-8")).hexdigest(), 16)
     taken = taken or set()
-    for i in range(len(NAMES)):
-        candidate = NAMES[(h + i) % len(NAMES)]
+    if role_id in PINNED:
+        return PINNED[role_id]
+    h = int(hashlib.sha1(role_id.encode("utf-8")).hexdigest(), 16)
+    for i in range(len(POOL)):
+        candidate = POOL[(h + i) % len(POOL)]
         if candidate not in taken:
             return candidate
-    return f"Panelist-{h % 1000}"  # more than 40 panelists; keep going rather than fail
+    return f"Panelist-{h % 1000}"  # more panelists than names; keep going rather than fail
 
 
 def assign(role_ids: list[str]) -> dict[str, str]:
     taken: set[str] = set()
     out: dict[str, str] = {}
-    for rid in role_ids:
+    for rid in sorted(role_ids, key=lambda r: r not in PINNED):  # pinned first so they always keep their name
         n = name_for(rid, taken)
         taken.add(n)
         out[rid] = n
-    return out
+    return {rid: out[rid] for rid in role_ids}
