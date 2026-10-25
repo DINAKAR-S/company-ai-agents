@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install into a venv and print the interpreter
+        shell: bash
+        run: |
+          python -m venv .venv
+          if [ -f .venv/Scripts/python.exe ]; then PY=.venv/Scripts/python.exe; else PY=.venv/bin/python; fi
+          echo "PY=$PY" >> "$GITHUB_ENV"
+          $PY -c "import sys; print(sys.executable, sys.version)"
+          $PY -m pip install --quiet --upgrade pip
+          $PY -m pip install --quiet -e ".[dev]"
+      - name: Lint
+        shell: bash
+        run: $PY -m ruff check src tests scripts
+      - name: Validate the catalog
+        shell: bash
+        run: $PY -m orgchart validate
+      - name: Tests
+        shell: bash
+        run: $PY -m pytest -q
+      - name: Proof numbers
+        shell: bash
+        run: $PY scripts/stats.py

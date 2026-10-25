@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orgchart-agents"
+version = "0.1.0"
+description = "A company org chart of 128 AI agent definitions, an interviewer that picks a team for your company, and exporters for Claude Code, Anthropic Managed Agents and n8n."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Dinakar Selvakumar"}]
+keywords = ["ai-agents", "claude", "claude-code", "managed-agents", "n8n", "org-chart", "system-prompts"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+orgchart = "orgchart.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/DINAKAR-S/orgchart-agents"
+Issues = "https://github.com/DINAKAR-S/orgchart-agents/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
