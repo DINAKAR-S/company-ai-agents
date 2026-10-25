@@ -22,7 +22,7 @@ from .catalog import (
     load_index,
 )
 
-EM_DASH = "—"
+EM_DASH = chr(0x2014)  # the em-dash, spelled out so the source file itself never contains one
 # A role reference looks like `sales/sdr`. We only treat it as a reference when
 # the left side is a known department, so URLs and paths in prose do not trip it.
 _REF = re.compile(r"`?\b([a-z0-9-]+)/([a-z0-9-]+)\b`?")
