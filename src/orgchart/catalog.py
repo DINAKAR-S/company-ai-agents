@@ -42,6 +42,7 @@ class Role:
     tags: list[str] = field(default_factory=list)
     body: str = ""
     path: Path | None = None
+    name: str = ""   # first name used on panels and the page; assigned once per catalog
 
     @property
     def slug(self) -> str:
@@ -134,4 +135,7 @@ def load_catalog(root: str | Path, strict: bool = True) -> Catalog:
                 id=entry["id"], title=entry["title"], department=entry["department"],
                 reports_to=entry["reports_to"], level=entry["level"],
             )
+    from .names import global_names
+    for rid, n in global_names(list(roles)).items():
+        roles[rid].name = n
     return Catalog(root=root, departments=index["departments"], roles=roles, index=index["roles"], style=house_style(root))

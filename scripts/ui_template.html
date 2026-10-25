@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>company-ai-agents</title>
+<meta name="description" content="135 AI agents arranged as a company org chart. Search by problem, click a seat, copy the prompt.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#F3F1EB; --paper-2:#FFFFFF; --ink:#111111; --ink-2:#4A4A46; --ink-3:#8A8A84; --rule:#D9D6CE; --rule-2:#BDB9AF;
+    --red:#E63312; --red-ink:#FFFFFF; --dim:0.32;
+    --col:calc((100% - 11 * 16px) / 12);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --paper:#121212; --paper-2:#1A1A1A; --ink:#F2F0EA; --ink-2:#B9B7B0; --ink-3:#7E7C76; --rule:#2A2A28; --rule-2:#3A3A37; --red:#FF4A2A; --red-ink:#111;
+  } }
+  :root[data-theme="dark"] {
+    --paper:#121212; --paper-2:#1A1A1A; --ink:#F2F0EA; --ink-2:#B9B7B0; --ink-3:#7E7C76; --rule:#2A2A28; --rule-2:#3A3A37; --red:#FF4A2A; --red-ink:#111;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: repeating-linear-gradient(to right, transparent 0, transparent calc(var(--col) + 16px - 1px), var(--rule) calc(var(--col) + 16px - 1px), var(--rule) calc(var(--col) + 16px));
+    opacity:.45; }
+  .wrap { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:0 24px; }
+  .mono { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:12px; letter-spacing:.02em; text-transform:uppercase; color:var(--ink-3); }
+  a { color:inherit; }
+  button { font:inherit; cursor:pointer; }
+  :focus-visible { outline:3px solid var(--red); outline-offset:2px; }
+
+  /* Masthead */
+  .mast { display:grid; grid-template-columns:repeat(12, 1fr); gap:16px; padding:28px 0 16px; border-bottom:2px solid var(--ink); align-items:end; }
+  .mast h1 { grid-column:1 / span 8; margin:0; font:800 clamp(34px, 5.2vw, 72px)/0.95 Archivo, Inter, sans-serif; letter-spacing:-0.03em; }
+  .mast h1 .dot { display:inline-block; width:.32em; height:.32em; background:var(--red); margin-left:.12em; vertical-align:baseline; }
+  .readouts { grid-column:9 / span 4; display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; border-left:1px solid var(--rule-2); padding-left:16px; }
+  .readouts div b { display:block; font:700 28px/1 Archivo, sans-serif; letter-spacing:-0.02em; }
+  .readouts div span { display:block; margin-top:6px; }
+  .tag-line { grid-column:1 / span 12; color:var(--ink-2); max-width:70ch; margin:0; }
+
+  /* Search */
+  .search { display:grid; grid-template-columns:repeat(12, 1fr); gap:16px; padding:18px 0; border-bottom:1px solid var(--rule-2); align-items:center; }
+  .search label { grid-column:1 / span 2; }
+  .search .field { grid-column:3 / span 8; display:flex; gap:8px; }
+  .search input { flex:1; min-width:0; height:48px; padding:0 14px; border:1.5px solid var(--ink); background:var(--paper-2); color:var(--ink); font:500 17px Inter, sans-serif; border-radius:0; }
+  .search input::placeholder { color:var(--ink-3); }
+  .btn { height:48px; padding:0 16px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); border-radius:0; font-weight:600; transition:background .2s, color .2s; }
+  .btn.ghost { background:transparent; color:var(--ink); }
+  .btn:hover { background:var(--red); border-color:var(--red); color:var(--red-ink); }
+  .search .hint { grid-column:11 / span 2; }
+  .chips { grid-column:1 / span 12; display:flex; flex-wrap:wrap; gap:6px 10px; }
+  .chip { height:34px; padding:0 10px; border:1px solid var(--rule-2); background:transparent; color:var(--ink-2); border-radius:0; font:500 13px Inter; transition:all .2s; }
+  .chip[aria-pressed="true"], .chip:hover { border-color:var(--ink); color:var(--ink); }
+  .chip[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
+
+  /* Layout */
+  .main { display:grid; grid-template-columns:repeat(12, 1fr); gap:16px; padding:20px 0 80px; }
+  .chart { grid-column:1 / span 8; min-width:0; }
+  .detail { grid-column:9 / span 4; position:sticky; top:16px; align-self:start; max-height:calc(100vh - 32px); overflow:auto; background:var(--paper-2); border:1.5px solid var(--ink); }
+
+  /* Results strip */
+  .results { display:none; margin:0 0 18px; border:1.5px solid var(--red); padding:12px 14px; background:var(--paper-2); }
+  .results.on { display:block; }
+  .results ol { margin:8px 0 0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:6px 14px; }
+  .results li button { all:unset; cursor:pointer; display:flex; gap:10px; align-items:baseline; width:100%; padding:6px 4px; border-bottom:1px solid var(--rule); }
+  .results li button:hover, .results li button:focus-visible { color:var(--red); }
+  .results li .n { font-family:"JetBrains Mono", monospace; color:var(--red); width:22px; }
+  .results li .t { color:var(--ink-3); font-size:13px; }
+
+  /* Org chart */
+  .tier { position:relative; }
+  .tier-label { display:flex; align-items:center; gap:12px; margin:0 0 10px; }
+  .tier-label::after { content:""; flex:1; height:1px; background:var(--rule-2); }
+  .seat { position:relative; display:grid; grid-template-columns:40px 1fr; gap:10px; align-items:center; width:100%; min-height:56px; padding:8px 10px 8px 12px; border:1px solid var(--rule-2); background:var(--paper-2); color:var(--ink); text-align:left; border-radius:0; transition:border-color .2s, transform .2s, opacity .25s; }
+  .seat:hover { border-color:var(--ink); }
+  .seat.on { border-color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
+  .seat.hit { border-left:5px solid var(--red); padding-left:8px; }
+  .seat .av { width:40px; height:40px; display:grid; place-items:center; background:var(--ink); color:var(--paper); font:700 15px Archivo, sans-serif; }
+  .seat.hit .av { background:var(--red); color:var(--red-ink); }
+  .seat .nm { font-weight:600; line-height:1.2; }
+  .seat .ti { font-size:13px; color:var(--ink-2); line-height:1.25; }
+  .seat .rk { position:absolute; top:6px; right:8px; font-family:"JetBrains Mono", monospace; font-size:11px; color:var(--red); }
+  .chart.filtering .seat:not(.hit) { opacity:var(--dim); }
+  .chart.filtering .seat:not(.hit):hover, .chart.filtering .seat.on { opacity:1; }
+
+  .ceo { display:grid; grid-template-columns:1fr; max-width:320px; margin:0 auto 0; }
+  .vline { width:1px; height:22px; background:var(--ink); margin:0 auto; }
+  .execs { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; position:relative; padding-top:14px; }
+  .execs::before { content:""; position:absolute; left:8%; right:8%; top:0; height:1px; background:var(--ink); }
+  .execs .seat { min-height:64px; }
+  .depts { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; margin-top:26px; }
+  .dept { border:1px solid var(--rule-2); background:transparent; }
+  .dept > header { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-bottom:1px solid var(--rule-2); cursor:pointer; }
+  .dept > header h3 { margin:0; font:700 15px/1.2 Archivo, sans-serif; letter-spacing:-0.01em; }
+  .dept > header small { display:block; color:var(--ink-3); font-weight:400; font-size:12px; margin-top:2px; }
+  .dept > header .count { font-family:"JetBrains Mono", monospace; font-size:12px; color:var(--ink-2); white-space:nowrap; }
+  .dept > header .count b { color:var(--red); }
+  .dept .body { display:none; padding:10px; gap:6px; flex-direction:column; }
+  .dept.open .body { display:flex; }
+  .dept .body .seat { min-height:50px; grid-template-columns:32px 1fr; }
+  .dept .body .seat .av { width:32px; height:32px; font-size:13px; }
+  .dept .head-seat { margin:0; }
+  .dept .body .lead { background:var(--paper); }
+
+  /* Detail */
+  .detail .empty { padding:36px 24px; color:var(--ink-2); }
+  .detail .empty h2 { font:700 22px/1.2 Archivo, sans-serif; margin:0 0 10px; letter-spacing:-0.02em; }
+  .detail .empty ol { margin:14px 0 0; padding-left:18px; }
+  .dhead { padding:20px 22px 14px; border-bottom:1px solid var(--rule-2); }
+  .dhead .who { display:flex; gap:12px; align-items:center; }
+  .dhead .av { width:52px; height:52px; display:grid; place-items:center; background:var(--ink); color:var(--paper); font:800 20px Archivo, sans-serif; }
+  .dhead h2 { margin:0; font:800 clamp(22px, 2.2vw, 30px)/1.05 Archivo, sans-serif; letter-spacing:-0.025em; }
+  .dhead h2 small { display:block; font:500 15px/1.3 Inter, sans-serif; color:var(--ink-2); letter-spacing:0; margin-top:4px; }
+  .dhead .meta { margin:12px 0 0; display:flex; flex-wrap:wrap; gap:4px 14px; }
+  .dhead .tags { margin:10px 0 0; display:flex; flex-wrap:wrap; gap:4px 10px; }
+  .dhead .tags span { font-family:"JetBrains Mono", monospace; font-size:12px; color:var(--ink-2); border-bottom:1px solid var(--rule-2); }
+  .dhead p.sum { margin:12px 0 0; font-size:15px; color:var(--ink-2); }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; padding:12px 22px; border-bottom:1px solid var(--rule-2); }
+  .actions .btn { height:42px; font-size:14px; }
+  .actions .ok { align-self:center; font-size:13px; color:var(--red); }
+  details.sec { border-bottom:1px solid var(--rule); }
+  details.sec summary { list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:12px 22px; font:700 15px Archivo, sans-serif; letter-spacing:-0.01em; }
+  details.sec summary::-webkit-details-marker { display:none; }
+  details.sec summary::after { content:"+"; font:500 18px "JetBrains Mono", monospace; color:var(--ink-3); }
+  details.sec[open] summary::after { content:"\2212"; }
+  details.sec summary:hover { color:var(--red); }
+  details.sec .in { padding:0 22px 16px; font-size:14.5px; }
+  details.sec .in ul, details.sec .in ol { margin:0; padding-left:18px; }
+  details.sec .in li { margin:4px 0; }
+  details.sec .in pre { white-space:pre-wrap; margin:0; background:var(--paper); border:1px solid var(--rule-2); padding:12px; font:13px/1.5 "JetBrains Mono", monospace; max-height:50vh; overflow:auto; }
+  .closer { display:none; }
+  footer { border-top:2px solid var(--ink); padding:18px 0 40px; color:var(--ink-2); font-size:14px; display:flex; gap:24px; flex-wrap:wrap; justify-content:space-between; }
+
+  /* Mobile */
+  @media (max-width: 960px) {
+    body::before { display:none; }
+    .mast h1, .readouts, .tag-line, .search label, .search .field, .search .hint, .chips { grid-column:1 / span 12; }
+    .readouts { border-left:0; padding-left:0; }
+    .main { display:block; }
+    .chart { display:block; }
+    .detail { position:fixed; inset:0; max-height:none; z-index:20; transform:translateY(100%); visibility:hidden; transition:transform .25s ease, visibility 0s .25s; border:0; border-top:3px solid var(--ink); }
+    .detail.open { transform:translateY(0); visibility:visible; transition:transform .25s ease; }
+    .closer { display:inline-flex; position:sticky; top:0; z-index:2; width:100%; justify-content:flex-end; padding:10px 14px; background:var(--paper-2); border-bottom:1px solid var(--rule-2); }
+    .execs { grid-template-columns:repeat(2, 1fr); }
+    .execs::before { display:none; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>company-ai-agents<span class="dot" aria-hidden="true"></span></h1>
+    <div class="readouts">
+      <div><b id="n-roles">__COUNT__</b><span class="mono">roles</span></div>
+      <div><b>__DEPTS__</b><span class="mono">departments</span></div>
+      <div><b>4</b><span class="mono">levels</span></div>
+    </div>
+    <p class="tag-line">An AI team for a company of 5 to 100 people. Every seat on this chart is a ready prompt with a boss, an approval gate and an escalation rule. Describe a problem and the right seats light up.</p>
+  </header>
+
+  <section class="search" aria-label="Find roles">
+    <label class="mono" for="q">Problem</label>
+    <div class="field">
+      <input id="q" type="search" autocomplete="off" placeholder="leads from events are never followed up, tickets pile up after releases, invoices unpaid, hiring takes months...">
+      <button class="btn ghost" id="clear" type="button">Clear</button>
+    </div>
+    <div class="hint mono" id="hint">word match, no model</div>
+    <div class="chips" id="chips" role="group" aria-label="Departments"></div>
+  </section>
+
+  <main class="main">
+    <section class="chart" id="chart" aria-label="Org chart">
+      <div class="results" id="results" aria-live="polite"></div>
+      <div class="tier">
+        <p class="tier-label mono">Tier 1 · the chair</p>
+        <div class="ceo" id="ceo"></div>
+        <div class="vline" aria-hidden="true"></div>
+      </div>
+      <div class="tier">
+        <p class="tier-label mono">Tier 2 · executives</p>
+        <div class="execs" id="execs"></div>
+      </div>
+      <div class="tier">
+        <p class="tier-label mono" style="margin-top:26px">Tier 3 and 4 · departments, click to open</p>
+        <div class="depts" id="depts"></div>
+      </div>
+    </section>
+
+    <aside class="detail" id="detail" aria-label="Role detail">
+      <div class="empty">
+        <h2>Pick a seat.</h2>
+        <p>Or describe the problem above. Matching seats get a red bar and a rank; everything else fades.</p>
+        <ol>
+          <li>Click a department to open its seats.</li>
+          <li>Click a seat: what it does, how it thinks, its rules, a worked example.</li>
+          <li>Copy the prompt, or copy it as a Claude Code subagent file.</li>
+        </ol>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <span>Every prompt refuses to send, post or change records without a human yes. Names are labels for readability.</span>
+    <span class="mono">built from the repo by scripts/build_ui.py</span>
+  </footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+const STOP = new Set(__STOP__);
+const ALIASES = __ALIASES__;
+const DEPT_ORDER = __DEPT_ORDER__;
+const W = {title:3, tags:3, triggers:1.5, skills:2, tasks:1, integrations:1.5};
+const byId = Object.fromEntries(DATA.roles.map(r => [r.id, r]));
+const $ = s => document.querySelector(s);
+const chart = $('#chart'), detail = $('#detail'), q = $('#q'), chips = $('#chips'), results = $('#results');
+let dept = null, selected = null, hits = new Map();
+
+function tokens(t){ const out=new Set(); for (const w of (t.toLowerCase().match(/[a-z][a-z0-9+-]{2,}/g)||[])) if(!STOP.has(w)) out.add(w); return out; }
+function expand(s){ const o=new Set(s); for (const t of s) for (const a of (ALIASES[t]||[])) o.add(a); return o; }
+function score(role, qs){ let sc=0, h=new Set(); for (const f in W){ for (const t of role.terms[f]) if (qs.has(t)){ sc+=W[f]; h.add(t);} } return [sc, [...h]]; }
+function section(body, h){ const i=body.indexOf(h); if(i<0) return ''; const rest=body.slice(i+h.length); const j=rest.indexOf('\n## '); return (j<0?rest:rest.slice(0,j)).trim(); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function initials(r){ return r.name.slice(0,1); }
+
+function seatHtml(r, cls='') {
+  const h = hits.get(r.id);
+  return `<button class="seat ${cls} ${h?'hit':''} ${selected===r.id?'on':''}" data-id="${r.id}" type="button" aria-label="${esc(r.name)}, ${esc(r.title)}">
+    <span class="av" aria-hidden="true">${initials(r)}</span>
+    <span><span class="nm">${esc(r.name)}</span><br><span class="ti">${esc(r.title)}</span></span>
+    ${h?`<span class="rk">#${h.rank}</span>`:''}</button>`;
+}
+
+function buildChart(){
+  const roles = DATA.roles;
+  const ceo = roles.find(r => !r.reports_to);
+  $('#ceo').innerHTML = seatHtml(ceo);
+  const execs = roles.filter(r => r.department==='c-suite' && r.reports_to===ceo.id);
+  $('#execs').innerHTML = execs.map(r => seatHtml(r)).join('');
+  const depts = DEPT_ORDER.filter(d => d!=='c-suite' && DATA.departments[d]);
+  $('#depts').innerHTML = depts.map(d => {
+    const members = roles.filter(r => r.department===d);
+    const heads = members.filter(r => r.reports_to && byId[r.reports_to] && byId[r.reports_to].department==='c-suite');
+    const rest = members.filter(r => !heads.includes(r));
+    const boss = heads[0] && byId[heads[0].reports_to];
+    const n = members.filter(r => hits.has(r.id)).length;
+    const open = (dept===d) || (hits.size && n>0);
+    return `<section class="dept ${open?'open':''}" data-dept="${d}">
+      <header role="button" tabindex="0" aria-expanded="${open}">
+        <div><h3>${esc(d)}</h3><small>${esc(DATA.departments[d])}${boss?` · reports to ${esc(boss.name)}`:''}</small></div>
+        <span class="count">${n?`<b>${n} match</b> · `:''}${members.length} seats</span>
+      </header>
+      <div class="body">
+        ${heads.map(r => seatHtml(r, 'lead')).join('')}
+        ${rest.sort((a,b)=> (hits.get(a.id)?.rank??999)-(hits.get(b.id)?.rank??999) || a.title.localeCompare(b.title)).map(r => seatHtml(r)).join('')}
+      </div></section>`;
+  }).join('');
+  chart.classList.toggle('filtering', hits.size>0);
+}
+
+function runSearch(){
+  const text = q.value.trim(); hits = new Map();
+  if (text){
+    const qs = expand(tokens(text));
+    const scored = DATA.roles.map(r => { const [sc, h] = score(r, qs); return {r, sc, h}; }).filter(x => x.sc>0)
+      .sort((a,b)=> b.sc-a.sc || a.r.id.localeCompare(b.r.id));
+    scored.forEach((x,i) => hits.set(x.r.id, {rank:i+1, matched:x.h, score:x.sc}));
+    const top = scored.slice(0,8);
+    results.classList.add('on');
+    results.innerHTML = top.length
+      ? `<span class="mono">${scored.length} seats match · top ${top.length}</span><ol>${top.map((x,i)=>`<li><button type="button" data-id="${x.r.id}"><span class="n">${i+1}</span><span><b>${esc(x.r.name)}</b> <span class="t">${esc(x.r.title)}</span><br><span class="t">${esc(x.h.slice(0,5).join(', '))}</span></span></button></li>`).join('')}</ol>`
+      : `<span class="mono">no seat matches those words</span><p style="margin:6px 0 0">Try the words a practitioner would use: tickets, leads, invoices, candidates, churn, dashboard.</p>`;
+    $('#hint').textContent = `${scored.length} match`;
+  } else { results.classList.remove('on'); results.innerHTML=''; $('#hint').textContent='word match, no model'; }
+  buildChart();
+}
+
+function show(id){
+  const r = byId[id]; if(!r) return; selected = id; buildChart();
+  const li = s => s.split('\n').filter(l=>/^(- |\d+\. )/.test(l)).map(l=>`<li>${esc(l.replace(/^(- |\d+\. )/,''))}</li>`).join('');
+  const ol = s => `<ol>${li(s)}</ol>`, ul = s => `<ul>${li(s)}</ul>`;
+  const prompt = r.body + '\n\n' + DATA.style;
+  const cc = `---\nname: ${r.id.replace('/','-')}\ndescription: ${r.title}. ${r.summary}\nmodel: ${({fast:'haiku',balanced:'sonnet',deep:'opus'})[r.model_hint]}\n---\n\n${prompt}`;
+  const boss = r.reports_to ? byId[r.reports_to] : null;
+  detail.innerHTML = `
+    <div class="closer"><button class="btn ghost" id="close" type="button">Close</button></div>
+    <div class="dhead">
+      <div class="who"><span class="av" aria-hidden="true">${initials(r)}</span><h2>${esc(r.name)}<small>${esc(r.title)}</small></h2></div>
+      <div class="meta mono"><span>${esc(r.id)}</span><span>${esc(r.level)}</span><span>model ${esc(r.model_hint)}</span><span>reports to ${boss?esc(boss.name)+', '+esc(boss.title):'human owner'}</span></div>
+      <div class="tags">${r.tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+      <p class="sum">${esc(r.summary)}</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="copy" type="button">Copy the prompt</button>
+      <button class="btn ghost" id="copycc" type="button">Copy as Claude Code subagent</button>
+      <span class="ok" id="ok" aria-live="polite"></span>
+    </div>
+    <details class="sec" open><summary>What this role does</summary><div class="in">${ul(section(r.body,'## What you do'))}</div></details>
+    <details class="sec"><summary>How it thinks</summary><div class="in">${ol(section(r.body,'## How you think'))}</div></details>
+    <details class="sec"><summary>Questions it asks first</summary><div class="in">${ul(section(r.body,'## Questions you ask first'))}</div></details>
+    <details class="sec"><summary>Working rules</summary><div class="in">${ul(section(r.body,'## Working rules'))}</div></details>
+    <details class="sec"><summary>Escalates when</summary><div class="in">${ul(section(r.body,'## Escalate when'))}</div></details>
+    <details class="sec"><summary>Mistakes it refuses to make</summary><div class="in">${ul(section(r.body,'## Common mistakes you refuse to make'))}</div></details>
+    <details class="sec"><summary>Worked example</summary><div class="in"><pre>${esc(section(r.body,'## Worked example'))}</pre></div></details>
+    <details class="sec"><summary>Full prompt</summary><div class="in"><pre>${esc(prompt)}</pre></div></details>`;
+  detail.classList.add('open');
+  const say = m => { $('#ok').textContent = m; setTimeout(()=>{ const o=$('#ok'); if(o) o.textContent=''; }, 2200); };
+  $('#copy').onclick = () => navigator.clipboard.writeText(prompt).then(()=>say('copied'), ()=>say('open Full prompt and copy'));
+  $('#copycc').onclick = () => navigator.clipboard.writeText(cc).then(()=>say('copied, save as .claude/agents/'+r.id.replace('/','-')+'.md'), ()=>say('copy failed'));
+  const c = $('#close'); if (c) c.onclick = () => detail.classList.remove('open');
+  detail.scrollTop = 0;
+}
+
+chips.innerHTML = `<button class="chip" type="button" data-d="" aria-pressed="true">All</button>` +
+  DEPT_ORDER.filter(d=>DATA.departments[d]).map(d=>`<button class="chip" type="button" data-d="${d}" aria-pressed="false" title="${esc(DATA.departments[d])}">${d}</button>`).join('');
+chips.onclick = e => { const b=e.target.closest('.chip'); if(!b) return; dept=b.dataset.d||null;
+  [...chips.children].forEach(c=>c.setAttribute('aria-pressed', c===b)); buildChart();
+  const el = dept && document.querySelector(`.dept[data-dept="${dept}"]`); if (el) el.scrollIntoView({block:'start'}); };
+chart.addEventListener('click', e => {
+  const s = e.target.closest('.seat, .results button'); if (s) { show(s.dataset.id); return; }
+  const h = e.target.closest('.dept > header'); if (h) { const d=h.parentElement; d.classList.toggle('open'); h.setAttribute('aria-expanded', d.classList.contains('open')); }
+});
+chart.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('.dept > header')) { e.preventDefault(); e.target.click(); } });
+q.addEventListener('input', runSearch);
+$('#clear').onclick = () => { q.value=''; runSearch(); q.focus(); };
+buildChart();
+</script>
+</body>
+</html>

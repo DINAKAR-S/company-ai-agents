@@ -14,6 +14,16 @@ NAMES = [
     "Dmitri", "Mei", "Rafael", "Zanele", "Tomasz", "Amara", "Luca", "Fatima", "Noah", "Yuki",
     "Elena", "Arjun", "Hanna", "Diego", "Nadia", "Kenji", "Chloe", "Tariq", "Greta", "Samuel",
     "Leila", "Mikael", "Ruth", "Idris", "Beatriz", "Jonas", "Anika", "Felix", "Imani", "Oscar",
+    "Aditi", "Bruno", "Carmen", "Dae-jung", "Esme", "Farid", "Gabriela", "Hamza", "Ines", "Jamal",
+    "Kaori", "Lorenzo", "Maya", "Nikolai", "Olumide", "Paulina", "Quentin", "Rania", "Sven", "Thandiwe",
+    "Umar", "Valentina", "Wei", "Ximena", "Yara", "Zoltan", "Abebe", "Bianca", "Cyrus", "Dalia",
+    "Emeka", "Freya", "Gustavo", "Halima", "Ivan", "Jiro", "Katarina", "Liam", "Marisol", "Naveen",
+    "Oona", "Pedro", "Qi", "Rosa", "Sanjay", "Tamar", "Ulrich", "Vera", "Wanjiru", "Xavier",
+    "Yusuf", "Zara", "Ayla", "Bastien", "Celine", "Dev", "Eitan", "Fola", "Giulia", "Hugo",
+    "Isla", "Joon", "Kofi", "Lucia", "Milo", "Nour", "Otto", "Petra", "Rohan", "Saoirse",
+    "Teo", "Uma", "Viktor", "Willa", "Yasmin", "Zeynep", "Anders", "Bao", "Clara", "Dara",
+    "Elif", "Finn", "Grace", "Hassan", "Ida", "Javier", "Kira", "Leon", "Mira", "Nils",
+    "Oriol", "Pia", "Ravi", "Sara", "Tobias", "Una", "Vikram", "Wren", "Yael", "Zia",
 ]
 
 
@@ -39,6 +49,13 @@ def name_for(role_id: str, taken: set[str] | None = None) -> str:
         if candidate not in taken:
             return candidate
     return f"Panelist-{h % 1000}"  # more panelists than names; keep going rather than fail
+
+
+def global_names(role_ids) -> dict[str, str]:
+    """One name per role across the whole catalog, deterministic: pinned first, then sorted ids.
+    Adding a role can shift a hash collision's resolution; names are labels, so that is acceptable."""
+    ordered = sorted(role_ids, key=lambda r: (r not in PINNED, r))
+    return assign(list(ordered))
 
 
 def assign(role_ids: list[str]) -> dict[str, str]:

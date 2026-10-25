@@ -66,3 +66,15 @@ What changed: patch scripts now check `old not in s and new in s` per step and s
 What looked fine: a spy that matched `id: legal/privacy-officer` in the system prompt.
 What was true: the system prompt is the body of the role file; the front matter with the id is never sent. The spy matched nothing and the test failed for the wrong reason.
 What changed: the test finds the panelist by role after the run and matches its panel name in the prompt, which is what the model actually sees.
+
+## A 40-name pool for 135 seats
+
+What looked fine: names hashed from role ids, unique within a panel.
+What was true: the browser page shows all 135 seats at once, and two executives were both "Idris".
+What changed: 160 names, one global deterministic assignment per catalog (pinned first, then sorted ids), stored on the role and used by the page and the panel alike, with a test that every role's name is unique.
+
+## A fixed panel slid off-screen is still on the page
+
+What looked fine: on phones the detail panel is `position: fixed` and `translateY(100%)` until opened.
+What was true: a transformed element still paints and still takes clicks where it lands; in a capture taller than the viewport it covered the search box.
+What changed: the closed state is also `visibility: hidden` with a delayed transition, so it neither paints nor intercepts anything.

@@ -25,7 +25,6 @@ from pathlib import Path
 from .catalog import Catalog, Role
 from .export import API_MODEL
 from .finder import Match, find
-from .names import assign
 
 DEFAULT_LEAD = "data-ai/data-ai-solutions-architect"
 DEFAULT_MEMORY = "orgchart-lessons.jsonl"
@@ -217,9 +216,8 @@ def build_panel(catalog: Catalog, problem: str, context: str, size: int = 6,
         chosen.append(m.role.id)
     if len(chosen) < 2:
         warnings.append("no roles matched the problem beyond the lead; add detail to the problem statement")
-    names = assign(chosen + [MODERATOR])
-    panel = [Panelist(catalog.roles[r], names[r], matched_terms.get(r, [])) for r in chosen]
-    moderator = Panelist(catalog.roles[MODERATOR], names[MODERATOR])
+    panel = [Panelist(catalog.roles[r], catalog.roles[r].name, matched_terms.get(r, [])) for r in chosen]
+    moderator = Panelist(catalog.roles[MODERATOR], catalog.roles[MODERATOR].name)
     return panel, moderator, warnings
 
 
@@ -280,16 +278,11 @@ def seat_consulted(catalog: Catalog, s: Session) -> list[str]:
         if len(added) >= s.max_extra_seats:
             s.warnings.append(f"lead asked for {rid!r} but the panel is full; skipped")
             continue
-        s.panel.append(Panelist(catalog.roles[rid], "", ["asked for by the lead"]))
+        s.panel.append(Panelist(catalog.roles[rid], catalog.roles[rid].name, ["asked for by the lead"]))
         present.add(rid)
         added.append(rid)
         if q:
             s.consult[rid] = q
-    if added:
-        names = assign([p.role.id for p in s.panel] + [MODERATOR])
-        for p in s.panel:
-            p.name = names[p.role.id]
-        s.moderator.name = names[MODERATOR]
     return added
 
 

@@ -53,6 +53,12 @@ def test_names_are_stable_and_unique_within_a_panel():
     assert all(n in NAMES or n.startswith("Panelist-") for n in names.values())
 
 
+def test_every_catalog_role_has_a_unique_name(catalog):
+    names = [r.name for r in catalog.roles.values()]
+    assert all(names) and len(set(names)) == len(names)
+    assert not any(n.startswith("Panelist-") for n in names)
+
+
 def test_hero_names_are_pinned_and_never_reused():
     from orgchart.names import PINNED
     assert name_for("data-ai/data-ai-solutions-architect") == "Steven"
