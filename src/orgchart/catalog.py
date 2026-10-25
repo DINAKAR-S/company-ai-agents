@@ -62,6 +62,7 @@ class Catalog:
     departments: dict[str, str]
     roles: dict[str, Role]
     index: list[dict]  # raw catalog.json entries, in file order
+    style: str = ""    # house style appended to every exported prompt
 
     def children(self, role_id: str) -> list[Role]:
         return [r for r in self.roles.values() if r.reports_to == role_id]
@@ -77,6 +78,15 @@ class Catalog:
 
     def by_department(self, dept: str) -> list[Role]:
         return [r for r in self.roles.values() if r.department == dept]
+
+
+def house_style(root: Path) -> str:
+    """agents/STYLE.md, minus its title and intro: the 'How you talk' section appended to every prompt."""
+    p = root / "agents" / "STYLE.md"
+    if not p.exists():
+        return ""
+    text = p.read_text(encoding="utf-8")
+    return text[text.index("## How you talk"):].rstrip() + "\n" if "## How you talk" in text else text
 
 
 def agent_path(root: Path, role_id: str) -> Path:
@@ -124,4 +134,4 @@ def load_catalog(root: str | Path, strict: bool = True) -> Catalog:
                 id=entry["id"], title=entry["title"], department=entry["department"],
                 reports_to=entry["reports_to"], level=entry["level"],
             )
-    return Catalog(root=root, departments=index["departments"], roles=roles, index=index["roles"])
+    return Catalog(root=root, departments=index["departments"], roles=roles, index=index["roles"], style=house_style(root))

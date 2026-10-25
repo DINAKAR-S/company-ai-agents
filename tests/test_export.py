@@ -78,3 +78,13 @@ def test_team_with_a_role_no_longer_in_catalog_skips_it(catalog, team, tmp_path)
     team.roles.append({"id": "sales/unicorn", "reason": "stale team file"})
     written = export_team(catalog, team, "n8n", tmp_path)
     assert not any("unicorn" in str(p) for p in written)
+
+
+@pytest.mark.parametrize("target", TARGETS)
+def test_house_style_is_in_every_exported_prompt(catalog, team, tmp_path, target):
+    assert catalog.style and "## How you talk" in catalog.style
+    export_team(catalog, team, target, tmp_path)
+    files = [p for p in tmp_path.rglob("*") if p.is_file() and p.name != "TEAM.md" and p.name != "cloud.yaml"]
+    assert files
+    for p in files:
+        assert "## How you talk" in p.read_text(encoding="utf-8"), p

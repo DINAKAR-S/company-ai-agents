@@ -167,6 +167,7 @@ class Session:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     lessons: list[dict] = field(default_factory=list)
+    style: str = ""
 
 
 def build_panel(catalog: Catalog, problem: str, context: str, size: int = 6,
@@ -195,7 +196,7 @@ def build_panel(catalog: Catalog, problem: str, context: str, size: int = 6,
     return panel, moderator, warnings
 
 
-def _persona(p: Panelist, panel: list[Panelist], lessons=None) -> str:
+def _persona(p: Panelist, panel: list[Panelist], lessons=None, style: str = "") -> str:
     others = ", ".join(x.label for x in panel if x is not p)
     text = (
         f"{p.role.body.rstrip()}\n\n## This panel\n\n"
@@ -205,6 +206,8 @@ def _persona(p: Panelist, panel: list[Panelist], lessons=None) -> str:
         "(rate limits, quotas, existing integrations, data quality, team capacity) and what you would do about it. "
         "Disagree when you disagree. Do not invent facts about the company; ask instead."
     )
+    if style:
+        text += "\n\n" + style
     mine, general = lessons_for(lessons or [], p.role.id)
     if mine or general:
         text += ("\n\n## Lessons from earlier panels\n\nThese were learned the hard way. "
@@ -223,7 +226,7 @@ def round1_prompt(s: Session, p: Panelist) -> tuple[str, str]:
             "edge cases a careful engineer would test for, requirements the solution must meet, what in the "
             "present setup will break and how you would mitigate each item, and the questions you would ask "
             "the company before starting.")
-    return _persona(p, s.panel, s.lessons), user
+    return _persona(p, s.panel, s.lessons, s.style), user
 
 
 def round2_prompt(s: Session, p: Panelist) -> tuple[str, str]:
@@ -234,7 +237,7 @@ def round2_prompt(s: Session, p: Panelist) -> tuple[str, str]:
     user = (_brief(s) + f"\n## Your position\n{mine}\n\n## The other positions\n{others}\n\n"
             "Which approach is best and why? Where do you disagree? Which edge cases did everyone miss? "
             "What do you change in your own position after reading theirs? Name people by their panel name.")
-    return _persona(p, s.panel, s.lessons), user
+    return _persona(p, s.panel, s.lessons, s.style), user
 
 
 def round3_prompt(s: Session) -> tuple[str, str]:
@@ -242,7 +245,8 @@ def round3_prompt(s: Session) -> tuple[str, str]:
     system = (f"{m.role.body.rstrip()}\n\n## This panel\n\nYour name is {m.name}. You moderated a panel of: "
               + ", ".join(p.label for p in s.panel) +
               ". You decide. Write for the person who asked, not for the panel. Markdown bodies must be complete "
-              "documents with headings. Every requirement is testable. Every edge case says what should happen.")
+              "documents with headings. Every requirement is testable. Every edge case says what should happen."
+              + ("\n\n" + s.style if s.style else ""))
     transcript = "\n\n".join(
         f"## Round 1: {name}\n{json.dumps(pos, indent=2)}" for name, pos in s.positions.items()
     ) + "\n\n" + "\n\n".join(
@@ -294,7 +298,7 @@ def solve(catalog: Catalog, problem: str, context: str = "", size: int = 6, lead
         context = context[:MAX_CONTEXT_CHARS]
     panel, moderator, w = build_panel(catalog, problem, context, size, lead, extra)
     s = Session(problem=problem.strip(), context=context.strip(), panel=panel, moderator=moderator,
-                warnings=warnings + w, lessons=lessons)
+                warnings=warnings + w, lessons=lessons, style=catalog.style)
     call = call or api_call
 
     for p in s.panel:

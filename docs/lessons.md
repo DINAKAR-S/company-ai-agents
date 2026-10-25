@@ -46,3 +46,10 @@ What changed: the lesson text is one quoted positional. The CLI test passes it t
 What looked fine: `fail_for={"Steven"}`.
 What was true: names are hashed from role ids, and the four-role panel for that problem had no Steven, so the "one panelist fails" test was testing nothing.
 What changed: the test builds the panel first and fails the actual first panelist.
+
+## Renaming the folder silently broke the venv
+
+What looked fine: tests passed, then the repo folder was renamed for the GitHub rename.
+What was true: the editable install in `.venv` still pointed at the old path, so `python -m orgchart` raised `ModuleNotFoundError` while the source sat right there.
+How it was caught: a subagent's validator run.
+What changed: `pip install -e .` again after any move. CI never sees this because it installs fresh; a local checkout does.

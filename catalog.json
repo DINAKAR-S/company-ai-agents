@@ -15,147 +15,957 @@
     "strategy": "Strategy, corporate development and research",
     "executive-support": "Executive office and internal communication"
   },
-  "levels": ["exec", "director", "manager", "ic"],
+  "levels": [
+    "exec",
+    "director",
+    "manager",
+    "ic"
+  ],
   "roles": [
-    {"id": "c-suite/ceo", "title": "Chief Executive Officer", "department": "c-suite", "reports_to": null, "level": "exec"},
-    {"id": "c-suite/coo", "title": "Chief Operating Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/cto", "title": "Chief Technology Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/cfo", "title": "Chief Financial Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/cro", "title": "Chief Revenue Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/cmo", "title": "Chief Marketing Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/cpo", "title": "Chief Product Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/chro", "title": "Chief People Officer", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/general-counsel", "title": "General Counsel", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "exec"},
-    {"id": "c-suite/chief-of-staff", "title": "Chief of Staff", "department": "c-suite", "reports_to": "c-suite/ceo", "level": "director"},
-
-    {"id": "engineering/vp-engineering", "title": "VP of Engineering", "department": "engineering", "reports_to": "c-suite/cto", "level": "exec"},
-    {"id": "engineering/engineering-manager", "title": "Engineering Manager", "department": "engineering", "reports_to": "engineering/vp-engineering", "level": "manager"},
-    {"id": "engineering/staff-engineer", "title": "Staff Software Engineer", "department": "engineering", "reports_to": "engineering/vp-engineering", "level": "ic"},
-    {"id": "engineering/backend-engineer", "title": "Backend Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/frontend-engineer", "title": "Frontend Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/mobile-engineer", "title": "Mobile Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/devops-sre", "title": "DevOps / Site Reliability Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/platform-engineer", "title": "Platform Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/security-engineer", "title": "Security Engineer", "department": "engineering", "reports_to": "engineering/vp-engineering", "level": "ic"},
-    {"id": "engineering/qa-engineer", "title": "QA / Test Automation Engineer", "department": "engineering", "reports_to": "engineering/engineering-manager", "level": "ic"},
-    {"id": "engineering/release-manager", "title": "Release Manager", "department": "engineering", "reports_to": "engineering/vp-engineering", "level": "ic"},
-    {"id": "engineering/technical-writer", "title": "Technical Writer", "department": "engineering", "reports_to": "engineering/vp-engineering", "level": "ic"},
-
-    {"id": "data-ai/head-of-data", "title": "Head of Data and AI", "department": "data-ai", "reports_to": "c-suite/cto", "level": "director"},
-    {"id": "data-ai/data-ai-solutions-architect", "title": "Data and AI Solutions Architect", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/ml-engineer", "title": "Machine Learning Engineer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/mlops-engineer", "title": "MLOps Engineer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/data-engineer", "title": "Data Engineer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/analytics-engineer", "title": "Analytics Engineer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/data-analyst", "title": "Data Analyst", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/data-scientist", "title": "Data Scientist", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/bi-developer", "title": "BI Developer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/ai-product-manager", "title": "AI Product Manager", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/prompt-engineer", "title": "Prompt and Evaluation Engineer", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-    {"id": "data-ai/data-governance-lead", "title": "Data Governance Lead", "department": "data-ai", "reports_to": "data-ai/head-of-data", "level": "ic"},
-
-    {"id": "product-design/head-of-product", "title": "Head of Product", "department": "product-design", "reports_to": "c-suite/cpo", "level": "director"},
-    {"id": "product-design/product-manager", "title": "Product Manager", "department": "product-design", "reports_to": "product-design/head-of-product", "level": "ic"},
-    {"id": "product-design/technical-product-manager", "title": "Technical Product Manager", "department": "product-design", "reports_to": "product-design/head-of-product", "level": "ic"},
-    {"id": "product-design/growth-pm", "title": "Growth Product Manager", "department": "product-design", "reports_to": "product-design/head-of-product", "level": "ic"},
-    {"id": "product-design/product-ops", "title": "Product Operations Manager", "department": "product-design", "reports_to": "product-design/head-of-product", "level": "ic"},
-    {"id": "product-design/product-analyst", "title": "Product Analyst", "department": "product-design", "reports_to": "product-design/head-of-product", "level": "ic"},
-    {"id": "product-design/head-of-design", "title": "Head of Design", "department": "product-design", "reports_to": "c-suite/cpo", "level": "director"},
-    {"id": "product-design/product-designer", "title": "Product Designer", "department": "product-design", "reports_to": "product-design/head-of-design", "level": "ic"},
-    {"id": "product-design/ux-researcher", "title": "UX Researcher", "department": "product-design", "reports_to": "product-design/head-of-design", "level": "ic"},
-    {"id": "product-design/ux-writer", "title": "UX Writer", "department": "product-design", "reports_to": "product-design/head-of-design", "level": "ic"},
-    {"id": "product-design/design-systems-lead", "title": "Design Systems Lead", "department": "product-design", "reports_to": "product-design/head-of-design", "level": "ic"},
-
-    {"id": "sales/head-of-sales", "title": "Head of Sales", "department": "sales", "reports_to": "c-suite/cro", "level": "director"},
-    {"id": "sales/sales-manager", "title": "Sales Manager", "department": "sales", "reports_to": "sales/head-of-sales", "level": "manager"},
-    {"id": "sales/sdr", "title": "Sales Development Representative", "department": "sales", "reports_to": "sales/sales-manager", "level": "ic"},
-    {"id": "sales/bdr", "title": "Business Development Representative", "department": "sales", "reports_to": "sales/sales-manager", "level": "ic"},
-    {"id": "sales/account-executive", "title": "Account Executive", "department": "sales", "reports_to": "sales/sales-manager", "level": "ic"},
-    {"id": "sales/enterprise-ae", "title": "Enterprise Account Executive", "department": "sales", "reports_to": "sales/sales-manager", "level": "ic"},
-    {"id": "sales/account-manager", "title": "Account Manager", "department": "sales", "reports_to": "sales/sales-manager", "level": "ic"},
-    {"id": "sales/sales-engineer", "title": "Sales Engineer", "department": "sales", "reports_to": "sales/head-of-sales", "level": "ic"},
-    {"id": "sales/revops", "title": "Revenue Operations Manager", "department": "sales", "reports_to": "c-suite/cro", "level": "manager"},
-    {"id": "sales/sales-enablement", "title": "Sales Enablement Manager", "department": "sales", "reports_to": "sales/head-of-sales", "level": "ic"},
-    {"id": "sales/partnerships-manager", "title": "Partnerships Manager", "department": "sales", "reports_to": "c-suite/cro", "level": "ic"},
-    {"id": "sales/deal-desk", "title": "Deal Desk Analyst", "department": "sales", "reports_to": "sales/revops", "level": "ic"},
-
-    {"id": "marketing/head-of-marketing", "title": "Head of Marketing", "department": "marketing", "reports_to": "c-suite/cmo", "level": "director"},
-    {"id": "marketing/content-lead", "title": "Content Marketing Lead", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/seo-specialist", "title": "SEO Specialist", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/social-media-manager", "title": "Social Media Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/performance-marketer", "title": "Performance Marketing Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/email-marketer", "title": "Email and Lifecycle Marketer", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/product-marketer", "title": "Product Marketing Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/brand-designer", "title": "Brand Designer", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/pr-comms", "title": "PR and Communications Manager", "department": "marketing", "reports_to": "c-suite/cmo", "level": "ic"},
-    {"id": "marketing/events-manager", "title": "Events and Field Marketing Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/marketing-ops", "title": "Marketing Operations Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-    {"id": "marketing/community-manager", "title": "Community Manager", "department": "marketing", "reports_to": "marketing/head-of-marketing", "level": "ic"},
-
-    {"id": "customer/head-of-customer-success", "title": "Head of Customer Success", "department": "customer", "reports_to": "c-suite/cro", "level": "director"},
-    {"id": "customer/customer-success-manager", "title": "Customer Success Manager", "department": "customer", "reports_to": "customer/head-of-customer-success", "level": "ic"},
-    {"id": "customer/onboarding-specialist", "title": "Customer Onboarding Specialist", "department": "customer", "reports_to": "customer/head-of-customer-success", "level": "ic"},
-    {"id": "customer/technical-account-manager", "title": "Technical Account Manager", "department": "customer", "reports_to": "customer/head-of-customer-success", "level": "ic"},
-    {"id": "customer/renewals-specialist", "title": "Renewals Specialist", "department": "customer", "reports_to": "customer/head-of-customer-success", "level": "ic"},
-    {"id": "customer/head-of-support", "title": "Head of Support", "department": "customer", "reports_to": "c-suite/coo", "level": "director"},
-    {"id": "customer/support-tier1", "title": "Support Agent, Tier 1", "department": "customer", "reports_to": "customer/head-of-support", "level": "ic"},
-    {"id": "customer/support-tier2", "title": "Support Engineer, Tier 2", "department": "customer", "reports_to": "customer/head-of-support", "level": "ic"},
-    {"id": "customer/support-escalation", "title": "Support Escalation Lead", "department": "customer", "reports_to": "customer/head-of-support", "level": "manager"},
-    {"id": "customer/knowledge-base-manager", "title": "Knowledge Base Manager", "department": "customer", "reports_to": "customer/head-of-support", "level": "ic"},
-    {"id": "customer/voice-of-customer-analyst", "title": "Voice of Customer Analyst", "department": "customer", "reports_to": "customer/head-of-customer-success", "level": "ic"},
-
-    {"id": "finance/vp-finance", "title": "VP of Finance", "department": "finance", "reports_to": "c-suite/cfo", "level": "exec"},
-    {"id": "finance/controller", "title": "Financial Controller", "department": "finance", "reports_to": "finance/vp-finance", "level": "manager"},
-    {"id": "finance/fp-and-a-analyst", "title": "FP&A Analyst", "department": "finance", "reports_to": "finance/vp-finance", "level": "ic"},
-    {"id": "finance/accounts-payable", "title": "Accounts Payable Specialist", "department": "finance", "reports_to": "finance/controller", "level": "ic"},
-    {"id": "finance/accounts-receivable", "title": "Accounts Receivable Specialist", "department": "finance", "reports_to": "finance/controller", "level": "ic"},
-    {"id": "finance/billing-ops", "title": "Billing Operations Specialist", "department": "finance", "reports_to": "finance/controller", "level": "ic"},
-    {"id": "finance/payroll-specialist", "title": "Payroll Specialist", "department": "finance", "reports_to": "finance/controller", "level": "ic"},
-    {"id": "finance/tax-compliance", "title": "Tax and Compliance Accountant", "department": "finance", "reports_to": "finance/controller", "level": "ic"},
-    {"id": "finance/treasury-analyst", "title": "Treasury Analyst", "department": "finance", "reports_to": "finance/vp-finance", "level": "ic"},
-    {"id": "finance/procurement", "title": "Procurement Specialist", "department": "finance", "reports_to": "finance/vp-finance", "level": "ic"},
-
-    {"id": "people/head-of-people", "title": "Head of People", "department": "people", "reports_to": "c-suite/chro", "level": "director"},
-    {"id": "people/recruiter", "title": "Recruiter", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/technical-recruiter", "title": "Technical Recruiter", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/hr-business-partner", "title": "HR Business Partner", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/hr-ops", "title": "HR Operations Specialist", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/onboarding-coordinator", "title": "Employee Onboarding Coordinator", "department": "people", "reports_to": "people/hr-ops", "level": "ic"},
-    {"id": "people/learning-development", "title": "Learning and Development Manager", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/compensation-benefits", "title": "Compensation and Benefits Analyst", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/employee-relations", "title": "Employee Relations Specialist", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-    {"id": "people/people-analytics", "title": "People Analytics Analyst", "department": "people", "reports_to": "people/head-of-people", "level": "ic"},
-
-    {"id": "operations/head-of-operations", "title": "Head of Operations", "department": "operations", "reports_to": "c-suite/coo", "level": "director"},
-    {"id": "operations/program-manager", "title": "Program Manager", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/project-manager", "title": "Project Manager", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/scrum-master", "title": "Scrum Master / Delivery Lead", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/business-analyst", "title": "Business Analyst", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/process-improvement", "title": "Process Improvement Lead", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/vendor-manager", "title": "Vendor Manager", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/it-admin", "title": "IT Administrator", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/office-facilities", "title": "Office and Facilities Manager", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-    {"id": "operations/supply-chain", "title": "Supply Chain and Logistics Coordinator", "department": "operations", "reports_to": "operations/head-of-operations", "level": "ic"},
-
-    {"id": "legal/contracts-manager", "title": "Contracts Manager", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/privacy-officer", "title": "Privacy Officer", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/compliance-analyst", "title": "Compliance Analyst", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/security-compliance", "title": "Security Compliance Lead (SOC 2 / ISO 27001)", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/ip-paralegal", "title": "IP and Trademark Paralegal", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/policy-writer", "title": "Policy Writer", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/risk-manager", "title": "Risk Manager", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-    {"id": "legal/corporate-paralegal", "title": "Corporate Paralegal", "department": "legal", "reports_to": "c-suite/general-counsel", "level": "ic"},
-
-    {"id": "strategy/head-of-strategy", "title": "Head of Strategy", "department": "strategy", "reports_to": "c-suite/ceo", "level": "director"},
-    {"id": "strategy/corporate-development", "title": "Corporate Development Manager", "department": "strategy", "reports_to": "strategy/head-of-strategy", "level": "ic"},
-    {"id": "strategy/investor-relations", "title": "Investor Relations Manager", "department": "strategy", "reports_to": "c-suite/cfo", "level": "ic"},
-    {"id": "strategy/market-research-analyst", "title": "Market Research Analyst", "department": "strategy", "reports_to": "strategy/head-of-strategy", "level": "ic"},
-    {"id": "strategy/competitive-intelligence", "title": "Competitive Intelligence Analyst", "department": "strategy", "reports_to": "strategy/head-of-strategy", "level": "ic"},
-    {"id": "strategy/pricing-strategist", "title": "Pricing Strategist", "department": "strategy", "reports_to": "strategy/head-of-strategy", "level": "ic"},
-
-    {"id": "executive-support/executive-assistant", "title": "Executive Assistant", "department": "executive-support", "reports_to": "c-suite/chief-of-staff", "level": "ic"},
-    {"id": "executive-support/internal-comms", "title": "Internal Communications Manager", "department": "executive-support", "reports_to": "c-suite/chief-of-staff", "level": "ic"},
-    {"id": "executive-support/board-ops", "title": "Board Operations Coordinator", "department": "executive-support", "reports_to": "c-suite/chief-of-staff", "level": "ic"},
-    {"id": "executive-support/okr-coordinator", "title": "OKR and Planning Coordinator", "department": "executive-support", "reports_to": "c-suite/chief-of-staff", "level": "ic"}
+    {
+      "id": "c-suite/ceo",
+      "title": "Chief Executive Officer",
+      "department": "c-suite",
+      "reports_to": null,
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/coo",
+      "title": "Chief Operating Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/cto",
+      "title": "Chief Technology Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/cfo",
+      "title": "Chief Financial Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/cro",
+      "title": "Chief Revenue Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/cmo",
+      "title": "Chief Marketing Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/cpo",
+      "title": "Chief Product Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/chro",
+      "title": "Chief People Officer",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/general-counsel",
+      "title": "General Counsel",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "exec"
+    },
+    {
+      "id": "c-suite/chief-of-staff",
+      "title": "Chief of Staff",
+      "department": "c-suite",
+      "reports_to": "c-suite/ceo",
+      "level": "director"
+    },
+    {
+      "id": "engineering/vp-engineering",
+      "title": "VP of Engineering",
+      "department": "engineering",
+      "reports_to": "c-suite/cto",
+      "level": "exec"
+    },
+    {
+      "id": "engineering/engineering-manager",
+      "title": "Engineering Manager",
+      "department": "engineering",
+      "reports_to": "engineering/vp-engineering",
+      "level": "manager"
+    },
+    {
+      "id": "engineering/staff-engineer",
+      "title": "Staff Software Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/vp-engineering",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/backend-engineer",
+      "title": "Backend Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/frontend-engineer",
+      "title": "Frontend Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/mobile-engineer",
+      "title": "Mobile Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/devops-sre",
+      "title": "DevOps / Site Reliability Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/platform-engineer",
+      "title": "Platform Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/security-engineer",
+      "title": "Security Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/vp-engineering",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/qa-engineer",
+      "title": "QA / Test Automation Engineer",
+      "department": "engineering",
+      "reports_to": "engineering/engineering-manager",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/release-manager",
+      "title": "Release Manager",
+      "department": "engineering",
+      "reports_to": "engineering/vp-engineering",
+      "level": "ic"
+    },
+    {
+      "id": "engineering/technical-writer",
+      "title": "Technical Writer",
+      "department": "engineering",
+      "reports_to": "engineering/vp-engineering",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/head-of-data",
+      "title": "Head of Data and AI",
+      "department": "data-ai",
+      "reports_to": "c-suite/cto",
+      "level": "director"
+    },
+    {
+      "id": "data-ai/data-ai-solutions-architect",
+      "title": "Data and AI Solutions Architect",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/ml-engineer",
+      "title": "Machine Learning Engineer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/mlops-engineer",
+      "title": "MLOps Engineer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/data-engineer",
+      "title": "Data Engineer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/analytics-engineer",
+      "title": "Analytics Engineer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/data-analyst",
+      "title": "Data Analyst",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/data-scientist",
+      "title": "Data Scientist",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/bi-developer",
+      "title": "BI Developer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/ai-product-manager",
+      "title": "AI Product Manager",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/prompt-engineer",
+      "title": "Prompt and Evaluation Engineer",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/data-governance-lead",
+      "title": "Data Governance Lead",
+      "department": "data-ai",
+      "reports_to": "data-ai/head-of-data",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/head-of-product",
+      "title": "Head of Product",
+      "department": "product-design",
+      "reports_to": "c-suite/cpo",
+      "level": "director"
+    },
+    {
+      "id": "product-design/product-manager",
+      "title": "Product Manager",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-product",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/technical-product-manager",
+      "title": "Technical Product Manager",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-product",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/growth-pm",
+      "title": "Growth Product Manager",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-product",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/product-ops",
+      "title": "Product Operations Manager",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-product",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/product-analyst",
+      "title": "Product Analyst",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-product",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/head-of-design",
+      "title": "Head of Design",
+      "department": "product-design",
+      "reports_to": "c-suite/cpo",
+      "level": "director"
+    },
+    {
+      "id": "product-design/product-designer",
+      "title": "Product Designer",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-design",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/ux-researcher",
+      "title": "UX Researcher",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-design",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/ux-writer",
+      "title": "UX Writer",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-design",
+      "level": "ic"
+    },
+    {
+      "id": "product-design/design-systems-lead",
+      "title": "Design Systems Lead",
+      "department": "product-design",
+      "reports_to": "product-design/head-of-design",
+      "level": "ic"
+    },
+    {
+      "id": "sales/head-of-sales",
+      "title": "Head of Sales",
+      "department": "sales",
+      "reports_to": "c-suite/cro",
+      "level": "director"
+    },
+    {
+      "id": "sales/sales-manager",
+      "title": "Sales Manager",
+      "department": "sales",
+      "reports_to": "sales/head-of-sales",
+      "level": "manager"
+    },
+    {
+      "id": "sales/sdr",
+      "title": "Sales Development Representative",
+      "department": "sales",
+      "reports_to": "sales/sales-manager",
+      "level": "ic"
+    },
+    {
+      "id": "sales/bdr",
+      "title": "Business Development Representative",
+      "department": "sales",
+      "reports_to": "sales/sales-manager",
+      "level": "ic"
+    },
+    {
+      "id": "sales/account-executive",
+      "title": "Account Executive",
+      "department": "sales",
+      "reports_to": "sales/sales-manager",
+      "level": "ic"
+    },
+    {
+      "id": "sales/enterprise-ae",
+      "title": "Enterprise Account Executive",
+      "department": "sales",
+      "reports_to": "sales/sales-manager",
+      "level": "ic"
+    },
+    {
+      "id": "sales/account-manager",
+      "title": "Account Manager",
+      "department": "sales",
+      "reports_to": "sales/sales-manager",
+      "level": "ic"
+    },
+    {
+      "id": "sales/sales-engineer",
+      "title": "Sales Engineer",
+      "department": "sales",
+      "reports_to": "sales/head-of-sales",
+      "level": "ic"
+    },
+    {
+      "id": "sales/revops",
+      "title": "Revenue Operations Manager",
+      "department": "sales",
+      "reports_to": "c-suite/cro",
+      "level": "manager"
+    },
+    {
+      "id": "sales/sales-enablement",
+      "title": "Sales Enablement Manager",
+      "department": "sales",
+      "reports_to": "sales/head-of-sales",
+      "level": "ic"
+    },
+    {
+      "id": "sales/partnerships-manager",
+      "title": "Partnerships Manager",
+      "department": "sales",
+      "reports_to": "c-suite/cro",
+      "level": "ic"
+    },
+    {
+      "id": "sales/deal-desk",
+      "title": "Deal Desk Analyst",
+      "department": "sales",
+      "reports_to": "sales/revops",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/head-of-marketing",
+      "title": "Head of Marketing",
+      "department": "marketing",
+      "reports_to": "c-suite/cmo",
+      "level": "director"
+    },
+    {
+      "id": "marketing/content-lead",
+      "title": "Content Marketing Lead",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/seo-specialist",
+      "title": "SEO Specialist",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/social-media-manager",
+      "title": "Social Media Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/performance-marketer",
+      "title": "Performance Marketing Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/email-marketer",
+      "title": "Email and Lifecycle Marketer",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/product-marketer",
+      "title": "Product Marketing Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/brand-designer",
+      "title": "Brand Designer",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/pr-comms",
+      "title": "PR and Communications Manager",
+      "department": "marketing",
+      "reports_to": "c-suite/cmo",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/events-manager",
+      "title": "Events and Field Marketing Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/marketing-ops",
+      "title": "Marketing Operations Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/community-manager",
+      "title": "Community Manager",
+      "department": "marketing",
+      "reports_to": "marketing/head-of-marketing",
+      "level": "ic"
+    },
+    {
+      "id": "customer/head-of-customer-success",
+      "title": "Head of Customer Success",
+      "department": "customer",
+      "reports_to": "c-suite/cro",
+      "level": "director"
+    },
+    {
+      "id": "customer/customer-success-manager",
+      "title": "Customer Success Manager",
+      "department": "customer",
+      "reports_to": "customer/head-of-customer-success",
+      "level": "ic"
+    },
+    {
+      "id": "customer/onboarding-specialist",
+      "title": "Customer Onboarding Specialist",
+      "department": "customer",
+      "reports_to": "customer/head-of-customer-success",
+      "level": "ic"
+    },
+    {
+      "id": "customer/technical-account-manager",
+      "title": "Technical Account Manager",
+      "department": "customer",
+      "reports_to": "customer/head-of-customer-success",
+      "level": "ic"
+    },
+    {
+      "id": "customer/renewals-specialist",
+      "title": "Renewals Specialist",
+      "department": "customer",
+      "reports_to": "customer/head-of-customer-success",
+      "level": "ic"
+    },
+    {
+      "id": "customer/head-of-support",
+      "title": "Head of Support",
+      "department": "customer",
+      "reports_to": "c-suite/coo",
+      "level": "director"
+    },
+    {
+      "id": "customer/support-tier1",
+      "title": "Support Agent, Tier 1",
+      "department": "customer",
+      "reports_to": "customer/head-of-support",
+      "level": "ic"
+    },
+    {
+      "id": "customer/support-tier2",
+      "title": "Support Engineer, Tier 2",
+      "department": "customer",
+      "reports_to": "customer/head-of-support",
+      "level": "ic"
+    },
+    {
+      "id": "customer/support-escalation",
+      "title": "Support Escalation Lead",
+      "department": "customer",
+      "reports_to": "customer/head-of-support",
+      "level": "manager"
+    },
+    {
+      "id": "customer/knowledge-base-manager",
+      "title": "Knowledge Base Manager",
+      "department": "customer",
+      "reports_to": "customer/head-of-support",
+      "level": "ic"
+    },
+    {
+      "id": "customer/voice-of-customer-analyst",
+      "title": "Voice of Customer Analyst",
+      "department": "customer",
+      "reports_to": "customer/head-of-customer-success",
+      "level": "ic"
+    },
+    {
+      "id": "finance/vp-finance",
+      "title": "VP of Finance",
+      "department": "finance",
+      "reports_to": "c-suite/cfo",
+      "level": "exec"
+    },
+    {
+      "id": "finance/controller",
+      "title": "Financial Controller",
+      "department": "finance",
+      "reports_to": "finance/vp-finance",
+      "level": "manager"
+    },
+    {
+      "id": "finance/fp-and-a-analyst",
+      "title": "FP&A Analyst",
+      "department": "finance",
+      "reports_to": "finance/vp-finance",
+      "level": "ic"
+    },
+    {
+      "id": "finance/accounts-payable",
+      "title": "Accounts Payable Specialist",
+      "department": "finance",
+      "reports_to": "finance/controller",
+      "level": "ic"
+    },
+    {
+      "id": "finance/accounts-receivable",
+      "title": "Accounts Receivable Specialist",
+      "department": "finance",
+      "reports_to": "finance/controller",
+      "level": "ic"
+    },
+    {
+      "id": "finance/billing-ops",
+      "title": "Billing Operations Specialist",
+      "department": "finance",
+      "reports_to": "finance/controller",
+      "level": "ic"
+    },
+    {
+      "id": "finance/payroll-specialist",
+      "title": "Payroll Specialist",
+      "department": "finance",
+      "reports_to": "finance/controller",
+      "level": "ic"
+    },
+    {
+      "id": "finance/tax-compliance",
+      "title": "Tax and Compliance Accountant",
+      "department": "finance",
+      "reports_to": "finance/controller",
+      "level": "ic"
+    },
+    {
+      "id": "finance/treasury-analyst",
+      "title": "Treasury Analyst",
+      "department": "finance",
+      "reports_to": "finance/vp-finance",
+      "level": "ic"
+    },
+    {
+      "id": "finance/procurement",
+      "title": "Procurement Specialist",
+      "department": "finance",
+      "reports_to": "finance/vp-finance",
+      "level": "ic"
+    },
+    {
+      "id": "people/head-of-people",
+      "title": "Head of People",
+      "department": "people",
+      "reports_to": "c-suite/chro",
+      "level": "director"
+    },
+    {
+      "id": "people/recruiter",
+      "title": "Recruiter",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/technical-recruiter",
+      "title": "Technical Recruiter",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/hr-business-partner",
+      "title": "HR Business Partner",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/hr-ops",
+      "title": "HR Operations Specialist",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/onboarding-coordinator",
+      "title": "Employee Onboarding Coordinator",
+      "department": "people",
+      "reports_to": "people/hr-ops",
+      "level": "ic"
+    },
+    {
+      "id": "people/learning-development",
+      "title": "Learning and Development Manager",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/compensation-benefits",
+      "title": "Compensation and Benefits Analyst",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/employee-relations",
+      "title": "Employee Relations Specialist",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "people/people-analytics",
+      "title": "People Analytics Analyst",
+      "department": "people",
+      "reports_to": "people/head-of-people",
+      "level": "ic"
+    },
+    {
+      "id": "operations/head-of-operations",
+      "title": "Head of Operations",
+      "department": "operations",
+      "reports_to": "c-suite/coo",
+      "level": "director"
+    },
+    {
+      "id": "operations/program-manager",
+      "title": "Program Manager",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/project-manager",
+      "title": "Project Manager",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/scrum-master",
+      "title": "Scrum Master / Delivery Lead",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/business-analyst",
+      "title": "Business Analyst",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/process-improvement",
+      "title": "Process Improvement Lead",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/vendor-manager",
+      "title": "Vendor Manager",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/it-admin",
+      "title": "IT Administrator",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/office-facilities",
+      "title": "Office and Facilities Manager",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "operations/supply-chain",
+      "title": "Supply Chain and Logistics Coordinator",
+      "department": "operations",
+      "reports_to": "operations/head-of-operations",
+      "level": "ic"
+    },
+    {
+      "id": "legal/contracts-manager",
+      "title": "Contracts Manager",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/privacy-officer",
+      "title": "Privacy Officer",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/compliance-analyst",
+      "title": "Compliance Analyst",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/security-compliance",
+      "title": "Security Compliance Lead (SOC 2 / ISO 27001)",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/ip-paralegal",
+      "title": "IP and Trademark Paralegal",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/policy-writer",
+      "title": "Policy Writer",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/risk-manager",
+      "title": "Risk Manager",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "legal/corporate-paralegal",
+      "title": "Corporate Paralegal",
+      "department": "legal",
+      "reports_to": "c-suite/general-counsel",
+      "level": "ic"
+    },
+    {
+      "id": "strategy/head-of-strategy",
+      "title": "Head of Strategy",
+      "department": "strategy",
+      "reports_to": "c-suite/ceo",
+      "level": "director"
+    },
+    {
+      "id": "strategy/corporate-development",
+      "title": "Corporate Development Manager",
+      "department": "strategy",
+      "reports_to": "strategy/head-of-strategy",
+      "level": "ic"
+    },
+    {
+      "id": "strategy/investor-relations",
+      "title": "Investor Relations Manager",
+      "department": "strategy",
+      "reports_to": "c-suite/cfo",
+      "level": "ic"
+    },
+    {
+      "id": "strategy/market-research-analyst",
+      "title": "Market Research Analyst",
+      "department": "strategy",
+      "reports_to": "strategy/head-of-strategy",
+      "level": "ic"
+    },
+    {
+      "id": "strategy/competitive-intelligence",
+      "title": "Competitive Intelligence Analyst",
+      "department": "strategy",
+      "reports_to": "strategy/head-of-strategy",
+      "level": "ic"
+    },
+    {
+      "id": "strategy/pricing-strategist",
+      "title": "Pricing Strategist",
+      "department": "strategy",
+      "reports_to": "strategy/head-of-strategy",
+      "level": "ic"
+    },
+    {
+      "id": "executive-support/executive-assistant",
+      "title": "Executive Assistant",
+      "department": "executive-support",
+      "reports_to": "c-suite/chief-of-staff",
+      "level": "ic"
+    },
+    {
+      "id": "executive-support/internal-comms",
+      "title": "Internal Communications Manager",
+      "department": "executive-support",
+      "reports_to": "c-suite/chief-of-staff",
+      "level": "ic"
+    },
+    {
+      "id": "executive-support/board-ops",
+      "title": "Board Operations Coordinator",
+      "department": "executive-support",
+      "reports_to": "c-suite/chief-of-staff",
+      "level": "ic"
+    },
+    {
+      "id": "executive-support/okr-coordinator",
+      "title": "OKR and Planning Coordinator",
+      "department": "executive-support",
+      "reports_to": "c-suite/chief-of-staff",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/linkedin-ghostwriter",
+      "title": "LinkedIn Ghostwriter",
+      "department": "marketing",
+      "reports_to": "marketing/content-lead",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/reddit-writer",
+      "title": "Reddit and Forum Writer",
+      "department": "marketing",
+      "reports_to": "marketing/community-manager",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/instagram-creator",
+      "title": "Instagram and Short-Form Content Creator",
+      "department": "marketing",
+      "reports_to": "marketing/social-media-manager",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/video-scriptwriter",
+      "title": "Short Video Scriptwriter",
+      "department": "marketing",
+      "reports_to": "marketing/content-lead",
+      "level": "ic"
+    },
+    {
+      "id": "marketing/newsletter-writer",
+      "title": "Newsletter Writer",
+      "department": "marketing",
+      "reports_to": "marketing/email-marketer",
+      "level": "ic"
+    },
+    {
+      "id": "sales/sales-call-coach",
+      "title": "Sales Call Coach",
+      "department": "sales",
+      "reports_to": "sales/sales-enablement",
+      "level": "ic"
+    },
+    {
+      "id": "data-ai/dashboard-builder",
+      "title": "Dashboard Builder",
+      "department": "data-ai",
+      "reports_to": "data-ai/bi-developer",
+      "level": "ic"
+    }
   ]
 }

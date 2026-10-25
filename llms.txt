@@ -1,0 +1,16 @@
+# company-ai-agents
+
+> 135 AI agent system prompts arranged as a company org chart, a finder and composer that pick roles for a problem or a company, a named panel that debates a problem into a plan, lessons memory, and exporters for Claude Code, Anthropic Managed Agents and n8n. Zero-dependency Python.
+
+## Start here
+- [AGENTS.md](AGENTS.md): what an agent should do when pointed at this repo
+- [README.md](README.md): scenario, commands, what is and is not built
+- [onboarding/problem-solver/AGENT.md](onboarding/problem-solver/AGENT.md): the front-door agent
+- [onboarding/interviewer/AGENT.md](onboarding/interviewer/AGENT.md): the team composer agent
+- [agents/STYLE.md](agents/STYLE.md): how every agent talks
+
+## Reference
+- [catalog.json](catalog.json): every role id, title, department, reporting line, level
+- [agents/TEMPLATE.md](agents/TEMPLATE.md): the role file format
+- [docs/solve.md](docs/solve.md): the panel protocol and lessons memory
+- [CONTRIBUTING.md](CONTRIBUTING.md): adding a role or department

@@ -1,0 +1,5 @@
+# Hero image
+
+`hero.jpg` was generated with an image model (Kie AI, Google Nano Banana) from the prompt below, then a caption strip with the names was added with Pillow because small badge text renders unreliably. Regenerate with any image model; keep Sam front and centre.
+
+Editorial team photo of seven friendly professionals standing together in a bright modern office, photographed like a magazine cover, warm natural light, shallow depth of field, confident relaxed smiles, diverse ages and backgrounds. In the centre front, slightly larger and closest to camera, a man in his thirties in a dark blue sweater, wearing a clear white name badge that reads "SAM  Problem Solver". Around him six colleagues, each wearing a clear white name badge with large legible black text: "STEVEN  Data & AI Architect", "PRIYA  Sales Development", "MATEO  Support Lead", "AISHA  Revenue Ops", "HIROSHI  Customer Success", "LENA  Chief of Staff". Badges are flat, sharp and perfectly readable. No other text anywhere. Realistic photography, 16:9.

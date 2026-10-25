@@ -35,3 +35,9 @@ Add it to `departments` in `catalog.json` with a one-line description, then add 
 - [ ] `python -m pytest -q` is green
 - [ ] `python scripts/stats.py` numbers in the README are updated if they changed
 - [ ] Any limitation you know of is added to the README's "What is not built yet" table rather than left for a reader to discover
+
+## House style and the web page
+
+`agents/STYLE.md` is appended to every exported prompt and every panelist. Change tone there, not in role files.
+
+`docs/index.html` is generated. After changing any role, run `python scripts/build_ui.py` and commit the result; CI does not rebuild it.

@@ -157,7 +157,7 @@ def cmd_solve(args) -> int:
         lessons, warnings = load_lessons(memory)
         panel, moderator, w = build_panel(cat, problem, context, args.size, args.lead, extra)
         s = Session(problem=problem.strip(), context=context.strip(), panel=panel, moderator=moderator,
-                    warnings=warnings + w, lessons=lessons)
+                    warnings=warnings + w, lessons=lessons, style=cat.style)
         for p in write_dry_run(s, args.out):
             print(p)
         print(f"dry run: {len(panel)} panelists + moderator, no model calls")

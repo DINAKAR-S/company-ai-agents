@@ -156,3 +156,14 @@ def test_debate_shows_what_breaks_and_mitigations(catalog, tmp_path):
     write_outputs(s, tmp_path)
     text = (tmp_path / "debate.md").read_text(encoding="utf-8")
     assert "What breaks in the present setup" in text and "helpdesk API rate limit" in text
+
+
+def test_house_style_reaches_every_panelist_and_the_moderator(catalog):
+    seen = []
+
+    def spy(model, system, user, schema):
+        seen.append(system)
+        return fake_call_factory()(model, system, user, schema)
+
+    solve(catalog, PROBLEM, CONTEXT, size=3, call=spy)
+    assert seen and all("## How you talk" in s_ for s_ in seen)

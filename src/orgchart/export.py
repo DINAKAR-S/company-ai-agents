@@ -39,6 +39,10 @@ CLAUDE_CODE_TOOLS = {
 }
 
 
+def _style(catalog: Catalog) -> str:
+    return ("\n" + catalog.style) if catalog.style else ""
+
+
 def _team_section(catalog: Catalog, team: Team, role: Role, runtime: str) -> str:
     members = [catalog.roles[r] for r in team.ids() if r in catalog.roles and r != role.id]
     lines = ["", "## Your team", ""]
@@ -83,8 +87,8 @@ def _claude_code(catalog: Catalog, team: Team, role: Role, out: Path) -> Path:
     }
     path = out / ".claude" / "agents" / f"{role.slug}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(frontmatter.dump(fm) + "\n" + role.body.rstrip() + "\n" + _team_section(catalog, team, role, "claude-code"),
-                    encoding="utf-8")
+    path.write_text(frontmatter.dump(fm) + "\n" + role.body.rstrip() + "\n" + _team_section(catalog, team, role, "claude-code")
+                    + _style(catalog), encoding="utf-8")
     return path
 
 
@@ -108,8 +112,8 @@ def _managed_agents(catalog: Catalog, team: Team, role: Role, out: Path) -> Path
     ]
     path = out / "agents" / f"{role.slug}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(fm_lines) + role.body.rstrip() + "\n" + _team_section(catalog, team, role, "managed-agents"),
-                    encoding="utf-8")
+    path.write_text("\n".join(fm_lines) + role.body.rstrip() + "\n" + _team_section(catalog, team, role, "managed-agents")
+                    + _style(catalog), encoding="utf-8")
     env = out / "environments" / "cloud.yaml"
     env.parent.mkdir(parents=True, exist_ok=True)
     if not env.exists():
@@ -126,7 +130,7 @@ def _n8n(catalog: Catalog, team: Team, role: Role, out: Path) -> Path:
         "name": role.title,
         "id": role.id,
         "model": API_MODEL[role.model_hint],
-        "systemMessage": role.body.rstrip() + "\n" + _team_section(catalog, team, role, "n8n"),
+        "systemMessage": role.body.rstrip() + "\n" + _team_section(catalog, team, role, "n8n") + _style(catalog),
         "suggestedTools": role.tools,
         "integrations": role.integrations,
         "triggers": role.triggers,
